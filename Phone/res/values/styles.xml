@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 手机端统一使用框架标准 Material 主题：厂商（如华为 EMUI/HarmonyOS）
+         通常不会覆盖它，避免 DeviceDefault 变体在定制系统上启动即崩 -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#f5f5fa</item>
+    </style>
+    <style name="Btn" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">@dimen/btn_minh</item>
+        <item name="android:textSize">@dimen/btn_text</item>
+        <item name="android:layout_margin">4dp</item>
+    </style>
+    <style name="BtnDanger" parent="@style/Btn">
+        <item name="android:textColor">#D32F2F</item>
+    </style>
+</resources>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="scr_pad">16dp</dimen>
+    <dimen name="btn_minh">56dp</dimen>
+    <dimen name="btn_text">16sp</dimen>
+</resources>

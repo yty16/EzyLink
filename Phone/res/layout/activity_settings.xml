@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="16dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="@string/settings_title" android:textSize="20sp"
+            android:textColor="#1b1136" android:layout_marginBottom="14dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editIp" android:hint="@string/hint_ip"
+            android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="10dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editPort" android:hint="@string/hint_port"
+            android:inputType="number" android:minHeight="50dp" android:layout_marginBottom="10dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editToken" android:hint="@string/hint_token"
+            android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="10dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <EditText android:id="@+id/editMac" android:hint="@string/hint_mac"
+            android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="18dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <CheckBox android:id="@+id/chkAutoConnect" android:text="@string/auto_connect"
+            android:textSize="15sp" android:textColor="#1b1136" android:checked="true"
+            android:minHeight="48dp" android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnSearch" android:text="@string/search_pc"
+            android:minHeight="50dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/searchResult" android:text="@string/search_hint"
+            android:textSize="12sp" android:textColor="#777777" android:layout_marginBottom="18dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnSave" android:text="@string/save"
+            android:minHeight="54dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>

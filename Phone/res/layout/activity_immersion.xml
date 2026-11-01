@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- 上下两等分触摸区：上=上一页，下=下一页；长按见 ImmersionActivity 说明 -->
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent" android:layout_height="match_parent">
+        <View android:id="@+id/zoneTop"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:background="#000000"/>
+        <View android:id="@+id/zoneBottom"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:background="#000000"/>
+    </LinearLayout>
+
+    <!-- 操作反馈：默认不可见，操作后短暂显示再淡出，避免常亮文字干扰放映 -->
+    <TextView android:id="@+id/immersionHint"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#FFFFFF" android:textSize="17sp"
+        android:visibility="invisible"/>
+
+</FrameLayout>

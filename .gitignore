@@ -1,0 +1,16 @@
+# 构建输出与中间产物
+[Bb]in/
+[Oo]bj/
+dist/publish/
+dist/*.zip
+dist/*.exe
+dist/*.apk
+installer/*.exe
+watch/*.apk
+phone/*.apk
+*.dex
+*.class
+*.cipx
+
+# 本地工作区数据（含项目记忆日志，不推送到公开仓库）
+.workbuddy/

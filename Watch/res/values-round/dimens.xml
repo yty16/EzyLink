@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 圆屏（如华为 Watch 4 Pro 466x466）：加大内边距，避免内容被圆形边缘裁切 -->
+    <dimen name="scr_pad">40dp</dimen>
+</resources>

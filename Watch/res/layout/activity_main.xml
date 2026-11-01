@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="@dimen/scr_pad" android:gravity="center_horizontal">
+        <TextView android:text="@string/app_name_en" android:textSize="9sp"
+            android:textColor="#6E6E88" android:layout_marginBottom="1dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/status" android:text="@string/status_ready"
+            android:textSize="13sp" android:textColor="#36E2E8"
+            android:layout_marginBottom="2dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/connState" android:text="@string/conn_idle"
+            android:textSize="11sp" android:textColor="#9E9E9E"
+            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnScan" style="@style/Btn" android:text="@string/scan_connect"/>
+            <Button android:id="@+id/btnImmersion" style="@style/Btn" android:text="@string/immersion_title"/>
+        </LinearLayout>
+        <TextView android:id="@+id/immersionHintMain" android:text="@string/immersion_help"
+            android:textSize="9sp" android:textColor="#9E9E9E"
+            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
+            android:layout_marginBottom="4dp" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnStart" style="@style/Btn" android:text="开始放映"/>
+            <Button android:id="@+id/btnNext" style="@style/Btn" android:text="下一张"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnPrev" style="@style/Btn" android:text="上一张"/>
+            <Button android:id="@+id/btnExit" style="@style/Btn" android:text="退出放映"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnBlack" style="@style/Btn" android:text="黑屏"/>
+            <Button android:id="@+id/btnWhite" style="@style/Btn" android:text="白屏"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnLock" style="@style/Btn" android:text="锁屏"/>
+            <Button android:id="@+id/btnSleep" style="@style/Btn" android:text="睡眠"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnWol" style="@style/Btn" android:text="开机"/>
+            <Button android:id="@+id/btnSettings" style="@style/Btn" android:text="设置"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnShutdown" style="@style/BtnDanger" android:text="关机"/>
+            <Button android:id="@+id/btnRestart" style="@style/BtnDanger" android:text="重启"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

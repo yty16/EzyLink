@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+        <item name="android:windowBackground">#1b1136</item>
+    </style>
+    <style name="Btn" parent="@android:style/Widget.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">@dimen/btn_minh</item>
+        <item name="android:textSize">@dimen/btn_text</item>
+        <item name="android:layout_margin">2dp</item>
+    </style>
+    <style name="BtnDanger" parent="@style/Btn">
+        <item name="android:textColor">#FF6B6B</item>
+    </style>
+</resources>

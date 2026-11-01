@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>YiTongYao</AssemblyName>
+    <RootNamespace>YiTongYao.Windows</RootNamespace>
+    <ApplicationIcon>Assets\vty_icon.ico</ApplicationIcon>
+    <AssemblyTitle>易通遥 远程控制</AssemblyTitle>
+    <Product>易通遥</Product>
+    <Version>1.7.0.0</Version>
+    <AssemblyVersion>1.7.0.0</AssemblyVersion>
+    <FileVersion>1.7.0.0</FileVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 同时启用 WPF 与 WinForms 时，SDK 会隐式全局导入 System.Windows.Forms，
+         导致 Button / CheckBox / ListBox 等控件名与 System.Windows.Controls 同名冲突。
+         这里移除该隐式导入，WinForms 类型由需要的源文件自行 using。 -->
+    <Using Remove="System.Windows.Forms" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\vty_icon.ico" />
+    <Content Include="Assets\vty_icon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\vty_icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- 隐私政策随程序发布：主界面「查看隐私政策」直接打开同目录下的 PRIVACY.md -->
+    <Content Include="..\..\PRIVACY.md" Link="PRIVACY.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

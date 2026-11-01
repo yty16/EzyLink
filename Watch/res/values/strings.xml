@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">易通遥</string>
+    <string name="app_name_en">EzyLink</string>
+    <string name="settings_title">连接设置</string>
+    <string name="hint_ip">电脑 IP</string>
+    <string name="hint_port">端口（默认 7788）</string>
+    <string name="hint_token">配对码</string>
+    <string name="hint_mac">电脑 MAC（仅开机需要）</string>
+    <string name="save">保存</string>
+    <string name="status_ready">就绪</string>
+    <string name="conn_idle">正在准备连接…</string>
+    <string name="auto_connect">打开应用时自动连接电脑</string>
+    <string name="search_pc">搜索电脑（自动发现）</string>
+    <string name="search_hint">不知道电脑 IP 时点上面按钮自动搜索。手表需与电脑在同一 WiFi，或已连上电脑的移动热点；不需要互联网。</string>
+    <string name="scan_connect">扫码连接</string>
+    <string name="scan_hint">在电脑端点「扫码连接」显示二维码，用手扫一下即自动填好地址与配对码。</string>
+    <string name="scan_title">扫描二维码</string>
+    <string name="scan_need_perm">需要相机权限才能扫码</string>
+    <string name="scan_no_camera">没有找到可用的相机</string>
+    <string name="scan_bad_code">这不是易通遥的配对二维码</string>
+    <!-- 沉浸模式 -->
+    <string name="immersion_title">沉浸模式</string>
+    <string name="immersion_help">进入后屏幕完全不发光（抬腕亮屏也不会亮），全部反馈靠震动：轻触上半屏上一页、下半屏下一页，旋转表冠同样翻页；长按上半屏开始/结束放映，长按下半屏退出沉浸模式。</string>
+    <!-- 指令回执前缀 -->
+    <string name="ok_prefix">OK </string>
+    <string name="err_prefix">ERR </string>
+</resources>
