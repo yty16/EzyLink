@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- 蓝牙 RFCOMM 服务端需要 WinRT API（Windows.Devices.Bluetooth.Rfcomm），
+         因此目标框架须带 Windows SDK 版本；19041 = Windows 10 2004，覆盖 Win10/11。 -->
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
@@ -10,11 +12,15 @@
     <AssemblyName>YiTongYao</AssemblyName>
     <RootNamespace>YiTongYao.Windows</RootNamespace>
     <ApplicationIcon>Assets\vty_icon.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- 项目同时启用 WinForms（托盘 NotifyIcon），SDK 会提示改用 WinForms 的 ApplicationHighDpiMode；
+         但本程序是 WPF 入口、不调用 ApplicationConfiguration.Initialize()，DPI 模式只能由 manifest 声明，故抑制该提示。 -->
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <AssemblyTitle>易通遥 远程控制</AssemblyTitle>
     <Product>易通遥</Product>
-    <Version>1.7.0.0</Version>
-    <AssemblyVersion>1.7.0.0</AssemblyVersion>
-    <FileVersion>1.7.0.0</FileVersion>
+    <Version>1.9.1.4</Version>
+    <AssemblyVersion>1.9.1.4</AssemblyVersion>
+    <FileVersion>1.9.1.4</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,8 +38,11 @@
     <Content Include="Assets\vty_icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <!-- 隐私政策随程序发布：主界面「查看隐私政策」直接打开同目录下的 PRIVACY.md -->
+    <!-- 隐私政策与 GPL-3.0 许可证全文随程序发布 -->
     <Content Include="..\..\PRIVACY.md" Link="PRIVACY.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\LICENSE" Link="LICENSE">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

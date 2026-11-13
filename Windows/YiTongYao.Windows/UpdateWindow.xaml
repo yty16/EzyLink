@@ -23,7 +23,7 @@
         </StackPanel>
 
         <Border Grid.Row="2" Background="#251846" CornerRadius="10" Padding="12">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly">
                 <TextBlock x:Name="ChangelogText" TextWrapping="Wrap" FontSize="13" Foreground="#bdb4e8" LineHeight="20"/>
             </ScrollViewer>
         </Border>

@@ -41,8 +41,8 @@ KEYSTORE = os.path.join(ROOT, "Tools", "debug.keystore")
 
 # 三端版本号独立计数（a.b.c.d）：d=小改+1，b=更新+1
 VERSIONS = {
-    "watch": ("1.5.1.2", 1050102),
-    "phone": ("1.3.1.1", 1030101),
+    "watch": ("1.6.0.1", 1060001),
+    "phone": ("1.4.0.1", 1040001),
 }
 
 ENV = dict(os.environ)
@@ -68,6 +68,37 @@ def ensure_keystore():
          "-dname", "CN=YiTongYao,O=YiTongYao,C=CN"])
 
 
+def sync_tree(source, target):
+    # 模块：增量同步源码/资源到 ASCII 临时目录
+    os.makedirs(target, exist_ok=True)
+    wanted = set()
+    for root, _, files in os.walk(source):
+        rel = os.path.relpath(root, source)
+        dst = target if rel == "." else os.path.join(target, rel)
+        os.makedirs(dst, exist_ok=True)
+        for f in files:
+            d = os.path.join(dst, f)
+            shutil.copy2(os.path.join(root, f), d)
+            wanted.add(os.path.normcase(os.path.abspath(d)))
+    for root, _, files in os.walk(target):
+        for f in files:
+            p = os.path.join(root, f)
+            if os.path.normcase(os.path.abspath(p)) not in wanted:
+                os.remove(p)
+
+
+def clean_outputs(out):
+    # 模块：仅清理会被覆盖的中间产物，避免整目录删除
+    for name in ("res.zip", "unsigned.apk", "withdex.apk", "aligned.apk",
+                 "classes.jar", "classes.dex", "watch-release.apk", "phone-release.apk"):
+        p = os.path.join(out, name)
+        if os.path.isfile(p):
+            os.remove(p)
+    dex = os.path.join(out, "dex", "classes.dex")
+    if os.path.isfile(dex):
+        os.remove(dex)
+
+
 def build(mod):
     vname, vcode = VERSIONS[mod]
     base = os.path.join(ROOT, mod)
@@ -77,18 +108,17 @@ def build(mod):
 
     # aapt2 等原生工具对中文路径参数支持不佳，先复制到 ASCII 临时目录构建，再拷回产物
     stage = os.path.join("C:/yty_build", mod)
-    if os.path.isdir(stage):
-        shutil.rmtree(stage)
     os.makedirs(stage, exist_ok=True)
     stage_src = os.path.join(stage, "src")
     stage_res = os.path.join(stage, "res")
     stage_man = os.path.join(stage, "AndroidManifest.xml")
-    shutil.copytree(src, stage_src)
-    shutil.copytree(res, stage_res)
+    sync_tree(src, stage_src)
+    sync_tree(res, stage_res)
     shutil.copy2(man, stage_man)
 
     out = os.path.join(stage, "out")
     os.makedirs(out, exist_ok=True)
+    clean_outputs(out)
 
     # 1) aapt2 编译资源
     reszip = os.path.join(out, "res.zip")
@@ -122,21 +152,22 @@ def build(mod):
          "@sources.txt"], cwd=stage)
 
     # 4) d8 生成 classes.dex
-    class_files = []
-    for root, _, files in os.walk(classes):
-        for f in files:
-            if f.endswith(".class"):
-                class_files.append(os.path.join(root, f))
     dexdir = os.path.join(out, "dex")
     os.makedirs(dexdir, exist_ok=True)
 
     # Windows 命令行上限约 8191 字符，直接把上百个 .class 绝对路径铺开会失败。
-    # 这里先把 classes 打成 jar 再交给 d8，命令行长度与源码数量无关。
+    # 先把本次编译产物打成 jar 再交给 d8；按源文件名筛掉历史遗留的 class。
+    stems = set()
+    for p in java_files:
+        stems.add(os.path.splitext(os.path.basename(p))[0])
     jarfile = os.path.join(out, "classes.jar")
-    if os.path.exists(jarfile):
-        os.remove(jarfile)
-    jar = os.path.join(JAVA_HOME, "bin", "jar.exe")
-    run([jar, "cf", os.path.relpath(jarfile, classes).replace("\\", "/"), "."], cwd=classes)
+    with zipfile.ZipFile(jarfile, "w", zipfile.ZIP_DEFLATED) as z:
+        for root, _, files in os.walk(classes):
+            for f in files:
+                if not f.endswith(".class") or f[:-6].split("$")[0] not in stems:
+                    continue
+                p = os.path.join(root, f)
+                z.write(p, os.path.relpath(p, classes).replace("\\", "/"))
     run([D8, "--release", "--min-api", "24", "--output",
          os.path.relpath(dexdir, stage).replace("\\", "/"),
          os.path.relpath(jarfile, stage).replace("\\", "/")], cwd=stage)

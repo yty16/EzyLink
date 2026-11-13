@@ -15,27 +15,10 @@ import java.io.OutputStreamWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
-/**
- * 自动连接管理器（纯 Android 框架层实现）。
- *
- * 目标：一次配置后，打开 App 即自动连上电脑，之后点按钮立刻生效，
- * 不需要每次手填 IP，也不需要互联网 —— 只要手机与电脑在同一网络
- * （同一个 WiFi，或手机连着电脑开的移动热点）。
- *
- * 工作方式：
- * 1. 优先用设置里已保存的 IP 直连；
- * 2. 连不上时向局域网广播 UDP 发现请求（端口 7789），电脑端会回复自己的地址；
- * 3. 仍连不上则按固定间隔自动重试，直到连上为止（App 在前台期间持续进行）；
- * 4. 连上后保持长连接：先完成配对码鉴权，之后每 15 秒 ping 保活，
- *    断开自动重连。长连接让点按钮即时生效，也避免每次都重新建连。
- */
+/** 自动连接管理：WiFi / 蓝牙双通道，全 App 共用一条长连接 */
 public final class ConnectionManager {
 
     public static final int STATE_OFF = 0;
@@ -59,7 +42,6 @@ public final class ConnectionManager {
     private static final int DISCOVERY_PORT = 7789;
     private static final String DISCOVERY_REQ = "YTY_DISCOVER";
     private static final int CONNECT_TIMEOUT = 2500;
-    private static final int IO_TIMEOUT = 6000;
     private static final long RETRY_INTERVAL = 3000;
     private static final long PING_INTERVAL = 15000;
 
@@ -68,7 +50,7 @@ public final class ConnectionManager {
     private final Handler main = new Handler(Looper.getMainLooper());
 
     private volatile boolean running;
-    private volatile Socket socket;
+    private volatile Transport transport;
     private volatile BufferedWriter writer;
     private volatile BufferedReader reader;
     private volatile String currentTarget = "";
@@ -79,9 +61,7 @@ public final class ConnectionManager {
         this.listener = listener;
     }
 
-    // 全 App 共用一条长连接：主页与沉浸页复用同一条，
-    // 避免沉浸页另起连接还要重新 UDP 广播发现（约 1.5s）才能用，
-    // 也就不会出现「刚进沉浸页点一下提示未连接电脑」
+    /** 共用实例 */
     private static ConnectionManager sShared;
 
     public static ConnectionManager shared(Context ctx) {
@@ -95,14 +75,13 @@ public final class ConnectionManager {
         return sShared;
     }
 
-    /** 切换接收状态回调的页面（共用连接时各页面各自设置；离开页面传 null）。 */
     public void setListener(Listener l) {
         this.listener = l;
     }
 
     public boolean isConnected() {
-        Socket s = socket;
-        return s != null && s.isConnected() && !s.isClosed();
+        Transport t = transport;
+        return t != null && t.isConnected();
     }
 
     public String getTarget() {
@@ -128,16 +107,11 @@ public final class ConnectionManager {
         if (t != null) t.interrupt();
     }
 
-    /** 唤醒工作线程立即重试一次（用户点了按钮但还没连上时调用）。 */
     public void wakeUp() {
         Thread t = worker;
         if (t != null) t.interrupt();
     }
 
-    /**
-     * 发送一条指令。调用方应在后台线程执行。
-     * 未连接时不静默失败：返回明确提示并触发立即重连。
-     */
     public Result send(String cmd) {
         if (!isConnected()) {
             wakeUp();
@@ -157,7 +131,6 @@ public final class ConnectionManager {
             }
 
             if (isConnected()) {
-                // 保活：定期 ping，失败则断开进入重连
                 sleepQuietly(PING_INTERVAL);
                 if (!isConnected()) continue;
                 Result r = sendInternal("ping");
@@ -169,20 +142,36 @@ public final class ConnectionManager {
             }
 
             setState(STATE_CONNECTING, "正在连接电脑…");
-            boolean ok = false;
-            // 先直连已保存的地址（约百毫秒）；失败再做 UDP 广播发现（约 1.5s）
-            String saved = prefs.getString("ip", "");
-            if (saved != null && !saved.trim().isEmpty()
-                    && tryConnect(saved.trim(), getPort())) {
-                ok = true;
+            String mode = getMode();
+            String btMac = prefs.getString("bt_mac", "");
+
+            List<Transport> fast = new ArrayList<Transport>();
+            if (!"bt".equals(mode)) {
+                String saved = prefs.getString("ip", "");
+                if (saved != null && !saved.trim().isEmpty()) {
+                    fast.add(new TcpTransport(saved.trim(), getPort()));
+                }
             }
+            if (!"wifi".equals(mode)) addBluetooth(fast, btMac);
+
+            boolean ok = false;
+            for (Transport t : fast) {
+                if (tryConnect(t)) { ok = true; break; }
+            }
+
             if (!ok) {
-                for (String ip : discover()) {
-                    if (ip == null || ip.trim().isEmpty()) continue;
-                    if (tryConnect(ip.trim(), getPort())) {
-                        ok = true;
-                        break;
+                List<Transport> slow = new ArrayList<Transport>();
+                if (!"bt".equals(mode)) {
+                    for (String ip : discover()) {
+                        if (ip != null && !ip.trim().isEmpty()) {
+                            slow.add(new TcpTransport(ip.trim(), getPort()));
+                        }
                     }
+                }
+                String btMac2 = prefs.getString("bt_mac", "");
+                if (!"wifi".equals(mode) && !btMac2.equals(btMac)) addBluetooth(slow, btMac2);
+                for (Transport t : slow) {
+                    if (tryConnect(t)) { ok = true; break; }
                 }
             }
 
@@ -198,25 +187,38 @@ public final class ConnectionManager {
                         continue;
                     }
                 }
-                // 记住这次成功的地址，下次优先直连
-                String host = currentTarget;
-                int idx = host.lastIndexOf(':');
-                if (idx > 0) {
-                    String ip = host.substring(0, idx);
+                Transport t = transport;
+                if (t instanceof TcpTransport) {
+                    String ip = ((TcpTransport) t).getHost();
                     if (!ip.equals(prefs.getString("ip", ""))) {
                         prefs.edit().putString("ip", ip).apply();
                     }
                 }
                 setState(STATE_ON, "已连接 " + currentTarget);
             } else {
-                setState(STATE_CONNECTING, "还没找到电脑，会自动重试。请确认：① 电脑端易通遥已启动服务；" +
-                        "② 手机与电脑在同一 WiFi，或已连上电脑的移动热点；③ 电脑防火墙已放行");
+                setState(STATE_CONNECTING, "还没找到电脑，会自动重试。请确认：① 电脑端已启动服务；" +
+                        "② WiFi 在同一网络 / 已连电脑热点，或已与电脑完成蓝牙配对；③ 防火墙已放行");
                 sleepQuietly(RETRY_INTERVAL);
             }
         }
     }
 
-    /** UDP 广播发现：向 255.255.255.255:7789 发请求，收集电脑端回复的地址。 */
+    /** 蓝牙候选 */
+    private void addBluetooth(List<Transport> out, String mac) {
+        if (!BtTransport.isMac(mac)) return;
+        Transport a = BtTransport.create(mac);
+        Transport b = BtTransport.createInsecure(mac);
+        if (a != null) out.add(a);
+        if (b != null) out.add(b);
+    }
+
+    private String getMode() {
+        String m = prefs.getString("conn_mode", "auto");
+        if (m == null || m.isEmpty()) return "auto";
+        return m;
+    }
+
+    /** UDP 广播发现；同时带回电脑端蓝牙 MAC */
     public List<String> discover() {
         List<String> out = new ArrayList<String>();
         DatagramSocket ds = null;
@@ -246,12 +248,17 @@ public final class ConnectionManager {
                             if (!ip.isEmpty()) out.add(ip);
                         }
                     }
-                    // 端口以电脑端实际监听的为准，自动纠正手填错误
                     if (port > 0 && port != getPort()) {
                         prefs.edit().putString("port", String.valueOf(port)).apply();
                     }
+                    String bm = o.optString("bt_mac", "");
+                    if (BtTransport.isMac(bm)) {
+                        prefs.edit().putString("bt_mac", bm).apply();
+                    }
+                    String bu = o.optString("bt_uuid", "");
+                    if (!bu.isEmpty()) prefs.edit().putString("bt_uuid", bu).apply();
                 } catch (Exception ignored) {
-                    break;   // 超时或解析失败即结束收集
+                    break;
                 }
             }
         } catch (Exception ignored) {
@@ -263,17 +270,16 @@ public final class ConnectionManager {
         return out;
     }
 
-    private boolean tryConnect(String ip, int port) {
+    private boolean tryConnect(Transport t) {
         try {
-            Socket s = new Socket();
-            s.connect(new InetSocketAddress(ip, port), CONNECT_TIMEOUT);
-            s.setSoTimeout(IO_TIMEOUT);
-            socket = s;
-            writer = new BufferedWriter(new OutputStreamWriter(s.getOutputStream(), "UTF-8"));
-            reader = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
-            currentTarget = ip + ":" + port;
+            t.connect(CONNECT_TIMEOUT);
+            transport = t;
+            writer = new BufferedWriter(new OutputStreamWriter(t.getOutputStream(), "UTF-8"));
+            reader = new BufferedReader(new InputStreamReader(t.getInputStream(), "UTF-8"));
+            currentTarget = t.describe();
             return true;
         } catch (Exception e) {
+            try { t.close(); } catch (Exception ignored) { }
             closeSocket();
             return false;
         }
@@ -318,17 +324,16 @@ public final class ConnectionManager {
     private void closeSocket() {
         try { if (writer != null) writer.close(); } catch (Exception ignored) { }
         try { if (reader != null) reader.close(); } catch (Exception ignored) { }
-        try { if (socket != null) socket.close(); } catch (Exception ignored) { }
+        try { if (transport != null) transport.close(); } catch (Exception ignored) { }
         writer = null;
         reader = null;
-        socket = null;
+        transport = null;
     }
 
     private void sleepQuietly(long ms) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ignored) {
-            // wakeUp() 打断睡眠以立即重试
         }
     }
 

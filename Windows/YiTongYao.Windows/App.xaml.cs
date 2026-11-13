@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace YiTongYao.Windows;
@@ -21,6 +22,10 @@ public partial class App : System.Windows.Application
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         base.OnStartup(e);
+
+        // 所有窗口显示前按当前屏幕 / DPI 收进工作区，避免小屏或高缩放下被裁切
+        EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
+            new RoutedEventHandler((sender, _) => { if (sender is Window w) FitWindow(w); }));
 
         // 隐私同意闸门：首次启动（或已撤回同意）时先征求同意，未同意则不创建主窗口直接退出。
         // 注意 StartupUri 已移除，主窗口在此处显式创建，确保闸门先于任何服务 / 托盘初始化。
@@ -42,6 +47,45 @@ public partial class App : System.Windows.Application
         }
 
         new MainWindow().Show();
+    }
+
+    /// <summary>把窗口限制在当前屏幕工作区内，超出时按比例缩小并移回可见范围。</summary>
+    public static void FitWindow(Window w)
+    {
+        try
+        {
+            // 用窗口所在显示器的工作区；SystemParameters.WorkArea 只返回主屏，多屏下会把副屏窗口拉回主屏
+            Rect area;
+            try
+            {
+                var wa = System.Windows.Forms.Screen.FromHandle(
+                    new System.Windows.Interop.WindowInteropHelper(w).Handle).WorkingArea;
+                area = new Rect(wa.Left, wa.Top, wa.Width, wa.Height);
+            }
+            catch { area = SystemParameters.WorkArea; }
+
+            var dpi = VisualTreeHelper.GetDpi(w);
+            double left = area.Left / dpi.DpiScaleX;
+            double top = area.Top / dpi.DpiScaleY;
+            double width = area.Width / dpi.DpiScaleX;
+            double height = area.Height / dpi.DpiScaleY;
+
+            // 上限取工作区整幅，最大化时才不会因上限偏小而四周留白
+            w.MaxWidth = Math.Max(w.MinWidth, width);
+            w.MaxHeight = Math.Max(w.MinHeight, height);
+            if (w.WindowState == WindowState.Maximized) return;
+
+            double maxW = Math.Max(w.MinWidth, width - 24);
+            double maxH = Math.Max(w.MinHeight, height - 24);
+            if (!double.IsNaN(w.Width) && w.Width > maxW) w.Width = maxW;
+            if (!double.IsNaN(w.Height) && w.Height > maxH) w.Height = maxH;
+
+            if (!double.IsNaN(w.Left) && (w.Left < left || w.Left + w.Width > left + width))
+                w.Left = Math.Max(left, left + (width - w.Width) / 2);
+            if (!double.IsNaN(w.Top) && (w.Top < top || w.Top + w.Height > top + height))
+                w.Top = Math.Max(top, top + (height - w.Height) / 2);
+        }
+        catch { }
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)

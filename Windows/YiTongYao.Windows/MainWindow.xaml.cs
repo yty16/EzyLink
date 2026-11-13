@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Windows.Media;
 using YiTongYao.Core;
 
 namespace YiTongYao.Windows;
@@ -15,6 +16,11 @@ public partial class MainWindow : Window
     private readonly SettingsStore _settings;
     private readonly DiscoveryService _discovery;
     private RemoteServer? _server;
+    private WinRtBluetoothServer? _bluetooth;
+    private string _btMac = string.Empty;
+    private bool _btStarting;
+    private WinRtWiFiDirectServer? _wifiDirect;
+    private string _wfdLastError = string.Empty;
     private NotifyIcon? _tray;
 
     // 推荐给设备连接的地址（移动热点地址优先）
@@ -42,6 +48,13 @@ public partial class MainWindow : Window
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetThreadDpiAwarenessContext();
+    [DllImport("user32.dll")]
+    private static extern bool AreDpiAwarenessContextsEqual(IntPtr a, IntPtr b);
+    [DllImport("user32.dll")]
+    private static extern int GetAwarenessFromDpiAwarenessContext(IntPtr ctx);
+
     // 日志框最大保留行数，超出后裁掉前面部分，避免长时间运行后内存/渲染压力
     private const int MaxLogLines = 800;
 
@@ -54,11 +67,19 @@ public partial class MainWindow : Window
         CrashLogger.LogRun("==== 程序启动 v" + AppConstants.Version +
                            (_startupLaunch ? "（开机自启）" : "") + " ====");
         _settings = SettingsStore.Load();
+        bool tokenUpgraded = string.IsNullOrWhiteSpace(_settings.Token) || _settings.Token.Length < 8;
+        if (tokenUpgraded)
+        {
+            _settings.Token = SettingsStore.GenerateToken();
+            _settings.Save();
+        }
         AuthService.Settings = _settings;
         _discovery = new DiscoveryService(Log);
         VersionText.Text = "EzyLink v" + AppConstants.Version;
         PortBox.Text = _settings.Port.ToString();
         TokenText.Text = _settings.Token;
+        if (tokenUpgraded)
+            Log("配对码已升级为 8 位数字（" + _settings.Token + "），请在手机 / 手表端重新扫码或更新配对码");
 
         LoadOptions();
         RefreshAuthUi();
@@ -72,6 +93,7 @@ public partial class MainWindow : Window
         ApplyStartupBehavior();
 
         SourceInitialized += Window_SourceInitialized;
+        SourceInitialized += (_, __) => { App.FitWindow(this); LogDisplayInfo(); };
 
         Log($"启动模式：{(_startupLaunch ? "开机自启" : "手动启动")}" +
             $"；托盘图标：{(_settings.HideTrayIcon ? "隐藏" : "显示")}" +
@@ -90,10 +112,37 @@ public partial class MainWindow : Window
                 Log("提示：未检测到防火墙放行规则，手机 / 手表可能连不上本机。请点上方「防火墙放行」按钮（需管理员确认）。");
         });
 
+        _ = InitializeBluetoothAsync();
+        InitializeWiFiDirect();
+
         // 打开主窗口前过一次解锁闸门；未通过则保持隐藏（仅驻留托盘 / 热键）。
         // 开机静默自启且未计划显示主窗口时不弹闸门，保持隐藏，服务照常启动。
         bool willShowWindow = !(_startupLaunch && _settings.LaunchSilently);
         if (willShowWindow && !EnsureUnlocked(AuthOperation.OpenMain)) Hide();
+    }
+
+    // ---------- 显示环境 ----------
+
+    /// <summary>启动日志记录缩放与 DPI 感知级别，便于高分屏 / 一体机现场排查。</summary>
+    private void LogDisplayInfo()
+    {
+        try
+        {
+            var dpi = VisualTreeHelper.GetDpi(this);
+            IntPtr ctx = GetThreadDpiAwarenessContext();
+            string mode = AreDpiAwarenessContextsEqual(ctx, new IntPtr(-4))
+                ? "PerMonitorV2"
+                : GetAwarenessFromDpiAwarenessContext(ctx) switch
+                {
+                    2 => "PerMonitor",
+                    1 => "SystemAware",
+                    0 => "Unaware",
+                    _ => "Unknown"
+                };
+            var wa = SystemParameters.WorkArea;
+            Log($"显示：缩放 {dpi.DpiScaleX * 100:0}%　DPI 感知 {mode}　工作区 {wa.Width:0}×{wa.Height:0}px");
+        }
+        catch { }
     }
 
     // ---------- 启动与托盘选项 ----------
@@ -109,7 +158,13 @@ public partial class MainWindow : Window
             LaunchSilentBox.IsChecked = _settings.LaunchSilently;
             HideTrayBox.IsChecked = _settings.HideTrayIcon;
             MinimizeTrayBox.IsChecked = _settings.MinimizeToTray;
+            // 二者互斥：任一项选中时禁用另一项，避免「隐藏托盘却最小化到托盘」导致无入口
+            HideTrayBox.IsEnabled = !_settings.MinimizeToTray;
             MinimizeTrayBox.IsEnabled = !_settings.HideTrayIcon;
+            BluetoothBox.IsChecked = _settings.BluetoothEnabled;
+            WfdBox.IsChecked = _settings.WiFiDirectEnabled;
+            BtPanel.Visibility = _settings.BluetoothEnabled ? Visibility.Visible : Visibility.Collapsed;
+            WfdPanel.Visibility = _settings.WiFiDirectEnabled ? Visibility.Visible : Visibility.Collapsed;
         }
         finally
         {
@@ -147,6 +202,163 @@ public partial class MainWindow : Window
                              : "未保护") + "）");
         AuthStatusText.Text = "已登记 " + n + " 种方式：" + string.Join("；", parts)
                               + (_settings.TwoFactorEnabled ? "。已启用双因子。" : "。");
+    }
+
+    // ---------- 蓝牙直连 ----------
+
+    private async Task RefreshBluetoothAsync()
+    {
+        _btMac = await WinRtBluetoothInfo.LocalMacAsync();
+        bool on = _bluetooth?.IsRunning == true;
+        _discovery.SetBluetooth(on, _btMac, WinRtBluetoothServer.ServiceUuid.ToString());
+        BtStatusText.Text = _btMac.Length == 0
+            ? "未检测到蓝牙适配器，蓝牙通道不可用（WiFi 通道不受影响）。"
+            : "本机蓝牙 MAC：" + _btMac + "　UUID：" + WinRtBluetoothServer.ServiceUuid
+              + (on ? "　（通道已开启）" : "　（未开启）");
+    }
+
+    private async Task StartBluetoothIfNeeded()
+    {
+        if (!_settings.BluetoothEnabled || _bluetooth?.IsRunning == true || _btStarting) return;
+        _btStarting = true;
+        try
+        {
+            var bt = new WinRtBluetoothServer(_settings.Token, Log);
+            if (!await bt.StartAsync()) { bt.Dispose(); return; }
+            _bluetooth = bt;
+            await RefreshBluetoothAsync();
+        }
+        finally { _btStarting = false; }
+    }
+
+    private async Task InitializeBluetoothAsync()
+    {
+        await RefreshBluetoothAsync();
+        await StartBluetoothIfNeeded();
+    }
+
+    private void StopBluetooth()
+    {
+        try { _bluetooth?.Stop(); _bluetooth?.Dispose(); } catch { }
+        _bluetooth = null;
+        _discovery.SetBluetooth(false, _btMac, WinRtBluetoothServer.ServiceUuid.ToString());
+        if (_btMac.Length > 0)
+            BtStatusText.Text = "本机蓝牙 MAC：" + _btMac + "　（通道已关闭）";
+    }
+
+    // ---------- 连接方式（复选框多选）----------
+
+    private async void BtOption_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loadingOptions) return;
+        _settings.BluetoothEnabled = BluetoothBox.IsChecked == true;
+        _settings.Save();
+        if (BtPanel != null)
+            BtPanel.Visibility = _settings.BluetoothEnabled ? Visibility.Visible : Visibility.Collapsed;
+        if (_settings.BluetoothEnabled)
+        {
+            await StartBluetoothIfNeeded();
+            if (_bluetooth?.IsRunning != true)
+                BtStatusText.Text = "蓝牙通道启动失败，请确认系统蓝牙已开启（WiFi 通道不受影响）。";
+            Log("已开启蓝牙通道");
+        }
+        else
+        {
+            StopBluetooth();
+            Log("已关闭蓝牙通道（WiFi 通道不受影响）");
+        }
+    }
+
+    private void WfdOption_Changed(object sender, RoutedEventArgs e)
+    {
+        if (_loadingOptions) return;
+        _settings.WiFiDirectEnabled = WfdBox.IsChecked == true;
+        _settings.Save();
+        if (WfdPanel != null)
+            WfdPanel.Visibility = _settings.WiFiDirectEnabled ? Visibility.Visible : Visibility.Collapsed;
+        if (_settings.WiFiDirectEnabled)
+        {
+            StartWiFiDirect();
+            if (_wifiDirect?.IsRunning != true)
+                WfdStatusText.Text = "Wi-Fi Direct 通道启动失败：" + _wfdLastError + "（WiFi 通道不受影响）";
+            Log("已开启 Wi-Fi Direct 通道");
+        }
+        else
+        {
+            StopWiFiDirect();
+            Log("已关闭 Wi-Fi Direct 通道（WiFi 通道不受影响）");
+        }
+    }
+
+    // ---------- Wi-Fi Direct 直连 ----------
+
+    private void InitializeWiFiDirect()
+    {
+        if (_settings.WiFiDirectEnabled) StartWiFiDirect();
+        else RefreshWfdUi();
+    }
+
+    private void StartWiFiDirect()
+    {
+        if (_wifiDirect?.IsRunning == true) return;
+        var wfd = new WinRtWiFiDirectServer(_settings.Token, Log);
+        wfd.StateChanged += () => Dispatcher.Invoke(RefreshWfdUi);
+        if (!wfd.Start())
+        {
+            _wfdLastError = wfd.LastError;
+            wfd.Dispose();
+            RefreshWfdUi();
+            return;
+        }
+        _wifiDirect = wfd;
+        _wfdLastError = string.Empty;
+        RefreshWfdUi();
+    }
+
+    private void StopWiFiDirect()
+    {
+        try { _wifiDirect?.Stop(); _wifiDirect?.Dispose(); } catch { }
+        _wifiDirect = null;
+        RefreshWfdUi();
+    }
+
+    private void RefreshWfdUi()
+    {
+        if (WfdStatusText == null) return;
+        var wfd = _wifiDirect;
+        bool on = wfd?.IsRunning == true;
+        string ip = wfd?.LocalAddress ?? string.Empty;
+        const string tip = "注意：Windows 移动热点与 Wi-Fi Direct 不能同时开启。";
+        string pwdTip = (wfd?.Passphrase.Length ?? 0) < 8 && on
+            ? "　提示：密码少于 8 位，部分设备会拒绝连接，届时把配对码改到 8 位以上即可。" : "";
+        if (on)
+        {
+            WfdSsidText.Text = "网络：" + WinRtWiFiDirectServer.Ssid + "　密码：" + (wfd?.Passphrase ?? "");
+            WfdStatusText.Text = "正在广播（" + (wfd?.PublisherStatus ?? "?") + "）"
+                + (ip.Length > 0 ? "　本机地址：" + ip : "　地址将在设备接入后显示")
+                + "　已连接 P2P 设备：" + (wfd?.ConnectionCount ?? 0)
+                + "。手机 / 手表连上这个 WiFi 后，易通遥会自动搜索到电脑。" + pwdTip + tip;
+        }
+        else
+        {
+            WfdSsidText.Text = "网络：" + WinRtWiFiDirectServer.Ssid + "（未开启）";
+            WfdStatusText.Text = "未开启"
+                + (_wfdLastError.Length > 0 ? "（上次启动失败：" + _wfdLastError + "）" : "")
+                + "。开启后本机会广播一个普通 WiFi 网络，手机 / 手表在系统 WiFi 设置里连上即可，连上后自动搜索到电脑。" + tip;
+        }
+    }
+
+    private void WfdCopyBtn_Click(object sender, RoutedEventArgs e)
+    {
+        var wfd = _wifiDirect;
+        if (wfd == null) { Log("请先启用 Wi-Fi Direct 热点，再复制热点信息。"); return; }
+        try
+        {
+            System.Windows.Clipboard.SetText("网络名称：" + WinRtWiFiDirectServer.Ssid
+                + "\n密码：" + wfd.Passphrase);
+            Log("已复制 Wi-Fi Direct 热点名称与密码");
+        }
+        catch (Exception ex) { Log("复制失败：" + ex.Message); }
     }
 
     // ---------- 隐私与授权 ----------
@@ -277,19 +489,35 @@ public partial class MainWindow : Window
     {
         if (_loadingOptions) return;
         bool hide = HideTrayBox.IsChecked == true;
-        _settings.HideTrayIcon = hide;
+        bool minimize = MinimizeTrayBox.IsChecked == true;
 
-        if (hide && _settings.MinimizeToTray)
+        // 二者互斥：以最后操作的一方为准，自动取消另一项
+        if (hide && minimize)
         {
-            // 托盘图标隐藏后「最小化到托盘」会让程序彻底失去入口，自动关闭该项
-            _settings.MinimizeToTray = false;
-            MinimizeTrayBox.IsChecked = false;
+            if (sender == HideTrayBox)
+            {
+                MinimizeTrayBox.IsChecked = false;
+                minimize = false;
+            }
+            else
+            {
+                HideTrayBox.IsChecked = false;
+                hide = false;
+            }
         }
+
+        _settings.HideTrayIcon = hide;
+        _settings.MinimizeToTray = minimize;
+
+        // 联动置灰：任一项被选中时禁用另一项，让用户一眼看出只能选其一
+        HideTrayBox.IsEnabled = !minimize;
         MinimizeTrayBox.IsEnabled = !hide;
+
         _settings.Save();
         ApplyTrayVisibility();
-        Log(hide ? "已隐藏系统托盘图标（可用 Ctrl+Alt+Y 唤出主窗口）"
-                 : "已显示系统托盘图标");
+        Log(hide ? "已隐藏系统托盘图标（Ctrl+Alt+Y 唤出主窗口，关闭即退出）"
+                 : minimize ? "已开启关闭时最小化到托盘"
+                 : "已恢复：关闭窗口直接退出，托盘图标显示");
     }
 
     private void ApplyTrayVisibility()
@@ -407,7 +635,8 @@ public partial class MainWindow : Window
         if (port <= 0 || port > 65535) port = _settings.Port;
 
         var ip = string.IsNullOrEmpty(_connectIp) ? IpText.Text : _connectIp;
-        var win = new QrWindow(ip, port, _settings.Token) { Owner = this };
+        string btMac = _bluetooth?.IsRunning == true ? _btMac : string.Empty;
+        var win = new QrWindow(ip, port, _settings.Token, btMac) { Owner = this };
         win.ShowDialog();
         Log($"已展示扫码连接二维码（{ip}:{port}），用手机 / 手表端「扫码连接」扫描即可自动连接。");
     }
@@ -562,7 +791,8 @@ public partial class MainWindow : Window
             Log($"本机地址：{(_connectIp ?? IpText.Text)}:{port}");
             Log("等待手表 / 手机连接…");
 
-            // 蓝牙是可选的第二通道：开启失败不影响 TCP（WiFi）通道
+            await RefreshBluetoothAsync();
+            await StartBluetoothIfNeeded();
         }
         else
         {
@@ -574,6 +804,8 @@ public partial class MainWindow : Window
 
     private Task StopServer()
     {
+        StopBluetooth();
+        StopWiFiDirect();
         SafeDisposeServer();
         _discovery.Stop();
         SetRunning(false);
@@ -739,6 +971,8 @@ public partial class MainWindow : Window
         CrashLogger.LogRun("==== 程序退出（用户关闭）====");
         try { if (_hwnd != IntPtr.Zero) UnregisterHotKey(_hwnd, HotkeyId); } catch { }
         _tray?.Dispose();
+        StopBluetooth();
+        StopWiFiDirect();
         SafeDisposeServer();
         _discovery.Stop();
         // 采用 OnExplicitShutdown：真正的退出必须由这里显式触发，否则收起的主窗口会让进程残留。

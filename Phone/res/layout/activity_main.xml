@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
     android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -19,6 +20,9 @@
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
             <Button android:id="@+id/btnScan" style="@style/Btn" android:text="@string/scan_connect"/>
             <Button android:id="@+id/btnImmersion" style="@style/Btn" android:text="@string/immersion_title"/>
+        </LinearLayout>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:id="@+id/btnDevices" style="@style/Btn" android:text="@string/devices_title"/>
         </LinearLayout>
         <TextView android:id="@+id/scanHint" android:text="@string/scan_hint"
             android:textSize="12sp" android:textColor="#5f6b7a" android:layout_marginBottom="8dp"

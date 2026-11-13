@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Linq;
 using System.Text.Json;
 
@@ -33,6 +34,12 @@ internal sealed class SettingsStore
     public bool HideTrayIcon { get; set; } = false;
 
     public bool AutoCheckUpdate { get; set; } = true;
+
+    /// <summary>是否启用蓝牙 RFCOMM 通道（独立于 WiFi 通道）。</summary>
+    public bool BluetoothEnabled { get; set; } = false;
+
+    /// <summary>是否启用 Wi-Fi Direct P2P 通道（独立于 WiFi / 蓝牙通道）。</summary>
+    public bool WiFiDirectEnabled { get; set; } = false;
 
     // ---------- 隐私与授权 ----------
 
@@ -121,12 +128,7 @@ internal sealed class SettingsStore
         catch { }
     }
 
-    /// <summary>
-    /// 生成一个 6 位随机配对码。
-    /// </summary>
+    /// <summary>生成一个 8 位随机配对码。</summary>
     public static string GenerateToken()
-    {
-        var rnd = new Random();
-        return rnd.Next(100000, 999999).ToString();
-    }
+        => RandomNumberGenerator.GetInt32(10000000, 100000000).ToString();
 }

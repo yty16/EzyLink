@@ -17,7 +17,7 @@
 - 长连接：鉴权后可连续发送多条指令；服务端单连接串行处理。
 - 编码示例：
   ```
-  {"cmd":"auth","token":"123456"}
+  {"cmd":"auth","token":"12345678"}
   {"cmd":"ppt_next"}
   {"cmd":"lock"}
   ```
@@ -98,11 +98,20 @@ YTY_DISCOVER
 **响应（电脑端 → 请求来源）**
 
 ```
-yty_here {"host":"DESKTOP-XXX","tcp_port":7788,"ips":["192.168.137.1","192.168.1.23"]}
+{"type":"yty_here","host":"DESKTOP-XXX","port":7788,"version":"1.9.1.4","ips":["192.168.137.1","192.168.1.23"],"bt_available":true,"bt_mac":"4C:0F:3E:27:D4:AD","bt_uuid":"6E8F3A21-5C7B-4D9E-A1F2-0B3C4D5E6F70"}
 ```
 
-- `ips` 为电脑全部可用 IPv4 地址，**按「与请求方同网段优先」排序**，多网卡 / 多网段机器也能连对。
-- 移动端拿到 `tcp_port` 与 `ips[0]` 后即可发起 TCP 连接并走 `auth` 握手。
+| 字段 | 说明 |
+|------|------|
+| `type` | 固定 `yty_here`，移动端据此过滤其它 UDP 包 |
+| `host` / `version` | 电脑名与电脑端版本号 |
+| `port` | TCP 服务端口，默认 `7788` |
+| `ips` | 电脑全部可用 IPv4 地址，**按「与请求方同网段优先」排序**，多网卡 / 多网段机器也能连对 |
+| `bt_available` | 电脑端蓝牙 RFCOMM 通道是否已开启 |
+| `bt_mac` / `bt_uuid` | 电脑蓝牙地址与服务 UUID，`bt_available=false` 时忽略 |
+
+- 移动端拿到 `port` 与 `ips[0]` 后即可发起 TCP 连接并走 `auth` 握手。
+- 移动端会自动保存 `bt_mac` / `bt_uuid` 作为蓝牙直连目标（无需手填）。
 - 发现走 UDP，**完全离线可用**（电脑开移动热点、手机连该热点时同样能发现）。
 
 ## 扫码连接（二维码载荷格式）
@@ -112,7 +121,7 @@ yty_here {"host":"DESKTOP-XXX","tcp_port":7788,"ips":["192.168.137.1","192.168.1
 **载荷格式（UTF-8 字节模式）**
 
 ```
-YTY1|<IP>|<端口>|<配对码>
+YTY1|<IP>|<端口>|<配对码>[|<电脑蓝牙 MAC>]
 ```
 
 | 字段 | 说明 |
@@ -121,11 +130,13 @@ YTY1|<IP>|<端口>|<配对码>
 | `<IP>` | 电脑 IPv4 地址，如 `192.168.137.1`（移动热点网关） |
 | `<端口>` | TCP 服务端口，默认 `7788` |
 | `<配对码>` | Windows 端显示的配对码，可为空（服务端未启用鉴权时） |
+| `<电脑蓝牙 MAC>` | 可选第 5 段，电脑端开启蓝牙通道后自动附加；形如 `4C:0F:3E:27:D4:AD` |
 
 示例：
 
 ```
-YTY1|192.168.137.1|7788|123456
+YTY1|192.168.137.1|7788|12345678
+YTY1|192.168.137.1|7788|12345678|4C:0F:3E:27:D4:AD
 ```
 
 **多网卡处理**：电脑端对每个可用 IPv4 各生成一张二维码（热点网段 `192.168.137.x` 优先），
@@ -139,6 +150,7 @@ YTY1|192.168.137.1|7788|123456
 | `192.168.1.2:7788|abc123` | IP=192.168.1.2，端口=7788，配对码=abc123 |
 | `192.168.1.2:7788` | IP=192.168.1.2，端口=7788，配对码为空 |
 | `YTY1|192.168.1.2|token=abc123` | IP=192.168.1.2，端口默认 7788，配对码=abc123 |
+| `YTY1|192.168.1.2|7788|abc123|4C:0F:3E:27:D4:AD` | 同上，并写入电脑蓝牙 MAC 作为蓝牙直连目标 |
 
 无法识别为易通遥配对码的内容，移动端会明确提示「这不是易通遥的配对二维码」，不会静默写入。
 
@@ -147,12 +159,32 @@ YTY1|192.168.137.1|7788|123456
 
 ## 连接保持
 
-- 移动端与电脑端之间维持 **TCP 长连接**：一次 `auth` 成功后可反复发送指令，无需每次握手。
-- 连接断开后移动端按固定间隔自动重连（优先上次成功地址，失败再走自动发现）。
+- 移动端与电脑端之间维持 **一条长连接**（TCP 或蓝牙 RFCOMM）：一次 `auth` 成功后可反复发送指令，无需每次握手。
+- 连接断开后移动端按固定间隔自动重连（优先上次成功地址，再试蓝牙，最后走 UDP 发现）。
 - 发送指令时若处于未连接状态，移动端会**明确提示并立即触发重连**，不会静默丢弃指令。
 
-## 蓝牙扩展（规划，未实现）
+## 蓝牙直连（RFCOMM / SPP）
 
-- Windows 端可用 `32feet.NET` 起 RFCOMM 服务；手表端用 `BluetoothSocket` 连接同一 UUID。
-- 应用层指令协议不变（同一套 JSON），仅传输从 TCP 切换到 RFCOMM 流。
-- 由于本环境无 Android SDK / 蓝牙硬件，蓝牙通道留作后续迭代。
+在没有 WiFi、也无法开热点的场景下，可改用蓝牙点对点通道。**应用层协议与 TCP 完全一致**（同一套按行 JSON + `auth` 配对码鉴权 + `SessionRunner` 会话层），仅底层传输从 TCP socket 换成 RFCOMM 流。
+
+- Windows 端：`Core/WinRtBluetoothServer.cs` 用 WinRT `RfcommServiceProvider` + `StreamSocketListener` 起服务并广播 SDP 记录；`Core/WinRtSocketStream.cs` 把 WinRT `StreamSocket` 适配成 .NET `Stream`。
+- 服务 UUID：`6E8F3A21-5C7B-4D9E-A1F2-0B3C4D5E6F70`（两端必须一致）。
+- 移动端：`BtTransport` 用 `BluetoothSocket.createRfcommSocketToServiceRecord` 连接，失败后回退 insecure 方式；`Transport` 抽象让 `ConnectionManager` 在 TCP / 蓝牙之间自动择优。
+- 连接方式 `conn_mode`：`auto`（保存的 IP 直连 → 蓝牙 → UDP 发现）/ `wifi`（仅 TCP）/ `bt`（仅蓝牙）。
+- 蓝牙连接设 8 秒超时，设备不可达时不会卡住自动重连。
+- 前提：电脑与手机 / 手表需先在操作系统中完成蓝牙配对；Android 12+ 需授予 `BLUETOOTH_CONNECT`。
+- 链路加密：`SocketProtectionLevel.BluetoothEncryptionAllowNullAuthentication`，应用层配对码仍单独校验。
+- 蓝牙通道与 TCP 通道可在电脑端同时开启，互不影响；关闭蓝牙不影响 WiFi 连接。
+
+## Wi-Fi Direct 直连（Legacy AP）
+
+与蓝牙不同，Wi-Fi Direct **不改变传输层**：它只是用 Wi-Fi Direct 硬件造出一条普通 IP 链路，链路建立后仍然走原有的 TCP `7788` / UDP `7789`，指令协议、`auth` 配对码鉴权和 `SessionRunner` 会话层完全不变。因此**移动端无需任何改动或新增权限**。
+
+- Windows 端：`Core/WinRtWiFiDirectServer.cs` 用 WinRT `WiFiDirectAdvertisementPublisher` 广播 P2P 组，并开启 `Advertisement.LegacySettings`（Legacy AP 模式），把该组同时广播成普通 WiFi 网络。
+- 网络名称固定为 `EzyLink-Direct`；WPA2 密码**就是电脑端配对码本身**（默认 8 位纯数字），界面可一键复制。重新生成或手改配对码后，热点密码同步变化。
+- 配对码由加密安全随机数生成，长度 8 位，满足 WPA2 对密码长度的最低要求；从旧版（6 位）升级时自动换新码，移动端需重新扫码或更新。手动把配对码改短仍可能被设备拒绝。
+- `IsAutonomousGroupOwnerEnabled = true` 让电脑作为组主并承担 DHCP；实测虚拟网卡 `Microsoft Wi-Fi Direct Virtual Adapter #2` 为 Up，地址 `192.168.137.1`。
+- 移动端连上该 WiFi 后，UDP 广播发现（7789）可直接使用；发现不通时手填电脑在该网段地址，或用「扫码连接」切换网卡地址后扫码。
+- 同时保留 `WiFiDirectConnectionListener` 接受标准 P2P 连接请求，连接建立后由 `WiFiDirectDevice.GetConnectionEndpointPairs()` 取得端点地址。
+- **互斥限制**：微软文档明确 Windows 移动热点与 Wi-Fi Direct 不能同时运行，移动热点优先；开启本通道前需确认系统移动热点已关闭。
+- 该热点不提供互联网接入，部分 Android / 手表系统会提示「无互联网」，需选择保持连接，否则可能自动回落到其它网络。

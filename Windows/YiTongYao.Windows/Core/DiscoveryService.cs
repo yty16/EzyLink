@@ -26,12 +26,23 @@ internal sealed class DiscoveryService : IDisposable
     private CancellationTokenSource? _cts;
     private readonly Action<string>? _log;
     private int _tcpPort;
+    private bool _btAvailable;
+    private string _btMac = string.Empty;
+    private string _btUuid = string.Empty;
 
     public bool IsRunning { get; private set; }
 
     public DiscoveryService(Action<string>? log = null)
     {
         _log = log;
+    }
+
+    /// <summary>蓝牙通道信息（自动发现响应中一并返回，供移动端直连）。</summary>
+    public void SetBluetooth(bool available, string mac, string uuid)
+    {
+        _btAvailable = available;
+        _btMac = mac ?? string.Empty;
+        _btUuid = uuid ?? string.Empty;
     }
 
     public void Start(int tcpPort)
@@ -110,7 +121,10 @@ internal sealed class DiscoveryService : IDisposable
             if (i > 0) sb.Append(',');
             sb.Append('"').Append(ips[i]).Append('"');
         }
-        sb.Append("]}");
+        sb.Append("],\"bt_available\":").Append(_btAvailable ? "true" : "false")
+          .Append(",\"bt_mac\":").Append(JsonEscape(_btMac))
+          .Append(",\"bt_uuid\":").Append(JsonEscape(_btUuid))
+          .Append('}');
         return sb.ToString();
     }
 

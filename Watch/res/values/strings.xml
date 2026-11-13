@@ -25,4 +25,18 @@
     <!-- 指令回执前缀 -->
     <string name="ok_prefix">OK </string>
     <string name="err_prefix">ERR </string>
+    <string name="conn_mode_label">连接方式</string>
+    <string name="mode_auto">自动</string>
+    <string name="mode_wifi">仅 WiFi</string>
+    <string name="mode_bt">仅蓝牙</string>
+    <string name="hint_bt_mac">电脑蓝牙 MAC（蓝牙直连用）</string>
+    <string name="bt_help">蓝牙直连需先在系统设置中与电脑完成配对；扫码或自动发现可自动填入蓝牙 MAC。</string>
+    <!-- 多设备（记录多台电脑 / 自由切换） -->
+    <string name="devices_title">设备</string>
+    <string name="devices_empty">还没有保存的电脑。点「扫码添加」扫电脑端二维码，或「手动新建」。</string>
+    <string name="devices_add_scan">扫码添加设备</string>
+    <string name="devices_add_manual">手动新建</string>
+    <string name="devices_switched">已切换设备</string>
+    <string name="devices_delete_title">删除设备</string>
+    <string name="devices_delete_msg">确定删除这台电脑吗？</string>
 </resources>

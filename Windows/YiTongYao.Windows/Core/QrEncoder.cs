@@ -91,10 +91,13 @@ internal static class QrEncoder
         return ExpTable[z];
     }
 
-    /// <summary>构造扫码载荷：<c>YTY1|IP|端口|配对码</c>。</summary>
-    public static string BuildPayload(string ip, int port, string pairCode)
+    /// <summary>构造扫码载荷：<c>YTY1|IP|端口|配对码[|蓝牙MAC]</c>。</summary>
+    public static string BuildPayload(string ip, int port, string pairCode, string btMac = "")
     {
-        return string.Format("{0}|{1}|{2}|{3}", PayloadPrefix, ip, port, pairCode);
+        string mac = (btMac ?? string.Empty).Trim();
+        return mac.Length == 0
+            ? string.Format("{0}|{1}|{2}|{3}", PayloadPrefix, ip, port, pairCode)
+            : string.Format("{0}|{1}|{2}|{3}|{4}", PayloadPrefix, ip, port, pairCode, mac);
     }
 
     /// <summary>将文本编码为二维码矩阵（true = 深色模块）。</summary>

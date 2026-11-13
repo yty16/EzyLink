@@ -10,6 +10,11 @@
     <!-- 扫码连接：本地相机取景并离线解码，不上传任何画面 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 蓝牙 RFCOMM 直连：Android 12+ 需 BLUETOOTH_CONNECT 运行时权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
     <!-- 声明为手表应用；required=false 以便可在华为 Watch 4 Pro(HarmonyOS) 等设备上侧载安装 -->
     <uses-feature android:name="android.hardware.type.watch" android:required="false" />
@@ -27,6 +32,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".DeviceListActivity" android:exported="false"
+            android:label="@string/devices_title"
+            android:screenOrientation="nosensor" />
         <activity android:name=".ImmersionActivity" android:exported="false"
             android:label="@string/immersion_title"
             android:screenOrientation="nosensor"

@@ -12,7 +12,7 @@ SetCompressor lzma
 
 !define APPNAME "易通遥"
 !define APPNAMEEN "YiTongYao"
-!define APPVERSION "1.7.0.0"
+!define APPVERSION "1.9.1.4"
 !define PUBLISHER "yty16"
 !define EXENAME "YiTongYao.exe"
 !define APPDIR "$LOCALAPPDATA\Programs\${APPNAME}"
@@ -33,7 +33,7 @@ RequestExecutionLevel user
 
 ; ---------- Install pages ----------
 !define MUI_WELCOMEPAGE_TITLE "欢迎使用 ${APPNAME} ${APPVERSION} 安装向导"
-!define MUI_WELCOMEPAGE_TEXT "本向导将引导您完成 ${APPNAME} 的安装。$\r$\n$\r$\n${APPNAME} 是一款局域网远程控制工具：用手表或手机通过 WiFi 直连电脑，即可控制 PPT 放映，并执行锁屏、睡眠、关机、重启等操作（开机需主板支持 WoL 网络唤醒）。点击$\"下一步$\"继续。"
+!define MUI_WELCOMEPAGE_TEXT "本向导将引导您完成 ${APPNAME} 的安装。$\r$\n$\r$\n${APPNAME} 是一款局域网远程控制工具：用手表或手机通过 WiFi、蓝牙或 Wi-Fi Direct 热点直连电脑，即可控制 PPT 放映，并执行锁屏、睡眠、关机、重启等操作（开机需主板支持 WoL 网络唤醒）。点击$\"下一步$\"继续。"
 !insertmacro MUI_PAGE_WELCOME
 
 !define MUI_LICENSEPAGE_RADIOBUTTONS

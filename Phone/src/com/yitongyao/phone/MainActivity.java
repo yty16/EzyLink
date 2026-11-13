@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -32,13 +33,19 @@ public class MainActivity extends Activity {
     private static final int REQ_SCAN = 9101;
     /** 相机权限请求码。 */
     private static final int REQ_CAM_PERM = 9102;
-    /** 电脑端二维码固定前缀：YTY1|IP|端口|配对码。 */
+    /** 蓝牙权限请求码。 */
+    private static final int REQ_BT_PERM = 9103;
+    /** 设备列表页请求码。 */
+    private static final int REQ_DEVICES = 9104;
+    private static final String BT_PERM = "android.permission.BLUETOOTH_CONNECT";
+    /** 电脑端二维码固定前缀：YTY1|IP|端口|配对码[|蓝牙MAC]。 */
     private static final String QR_PREFIX = "YTY1|";
 
     private SharedPreferences prefs;
     private TextView status;
     private TextView connState;
     private ConnectionManager conn;
+    private DeviceStore deviceStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +68,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         prefs = getSharedPreferences("yity", Context.MODE_PRIVATE);
+        deviceStore = new DeviceStore(prefs);
+        deviceStore.current();   // 首次启动把旧版单一连接迁移为「我的电脑」
         status = findViewById(R.id.status);
         connState = findViewById(R.id.connState);
 
@@ -89,6 +98,12 @@ public class MainActivity extends Activity {
                 startActivity(new Intent(MainActivity.this, SettingsActivity.class));
             }
         });
+        findViewById(R.id.btnDevices).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
+                        REQ_DEVICES);
+            }
+        });
         findViewById(R.id.btnScan).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 startScan();
@@ -112,6 +127,14 @@ public class MainActivity extends Activity {
             applyConnState(ConnectionManager.STATE_ON, "已连接 " + conn.getTarget());
         } else {
             applyConnState(ConnectionManager.STATE_CONNECTING, "正在连接电脑…");
+        }
+    }
+
+    /** 蓝牙权限 */
+    private void ensureBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= 31
+                && checkSelfPermission(BT_PERM) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{BT_PERM}, REQ_BT_PERM);
         }
     }
 
@@ -153,57 +176,16 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 解析电脑端二维码内容，写入连接设置并立即重连。
-     * 支持标准格式 YTY1|IP|端口|配对码，并容错「IP:端口|配对码」「IP:端口」等写法。
+     * 解析电脑端二维码：把扫码得到的电脑作为一台设备写入仓库（同 IP+端口则合并），
+     * 并立即切换为当前设备触发重连。支持标准格式 YTY1|IP|端口|配对码[|蓝牙MAC] 及容错写法。
      */
     private boolean applyQrPayload(String text) {
-        if (text == null) return false;
-        String t = text.trim();
-        if (t.length() == 0) return false;
-
-        String ip = "";
-        String port = "7788";
-        String token = "";
-
-        if (t.startsWith(QR_PREFIX)) {
-            String[] p = t.substring(QR_PREFIX.length()).split("\\|");
-            if (p.length < 1) return false;
-            ip = p[0].trim();
-            if (p.length >= 2) {
-                String seg = p[1].trim();
-                if (seg.startsWith("token=")) token = seg.substring(6).trim();
-                else if (seg.length() > 0) port = seg;
-            }
-            for (int i = 2; i < p.length; i++) {
-                String seg = p[i].trim();
-                if (seg.startsWith("token=")) token = seg.substring(6).trim();
-                else if (token.length() == 0) token = seg;
-            }
-        } else {
-            // 容错：形如 192.168.1.2:7788|123456
-            String[] segs = t.split("\\|");
-            String head = segs[0].trim();
-            int c = head.lastIndexOf(':');
-            if (c > 0) {
-                ip = head.substring(0, c).trim();
-                port = head.substring(c + 1).trim();
-            } else {
-                ip = head;
-            }
-            if (segs.length >= 2) token = segs[1].trim();
-        }
-
-        if (ip.length() == 0) return false;
-        if (port.length() == 0) port = "7788";
-
-        prefs.edit()
-                .putString("ip", ip)
-                .putString("port", port)
-                .putString("token", token)
-                .putBoolean("auto_connect", true)
-                .apply();
-
-        status.setText("扫码成功，正在连接 " + ip + ":" + port + " …");
+        Device d = Device.fromQr(text);
+        if (d == null) return false;
+        Device saved = deviceStore.upsertFromQr(d);
+        deviceStore.activate(saved.id);
+        String label = saved.name != null && !saved.name.isEmpty() ? saved.name : saved.ip;
+        status.setText("已添加/切换：" + label + " " + saved.ip + ":" + saved.port + " …");
         if (conn != null) conn.wakeUp();
         return true;
     }
@@ -211,8 +193,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // 从设置页返回后立刻重试（可能刚改了 IP / 配对码）
+        // 从设置页 / 设备列表返回后立刻重试（可能刚切换了设备 / 改了 IP / 配对码）
         if (conn != null) conn.wakeUp();
+    }
+
+    /** 表冠（旋转侧键 / 表圈）旋转 → 主页面纵向滚动。 */
+    @Override
+    public boolean onGenericMotionEvent(MotionEvent event) {
+        if (Rotary.scroll(this, event, R.id.scroll, 100f)) return true;
+        return super.onGenericMotionEvent(event);
     }
 
     @Override

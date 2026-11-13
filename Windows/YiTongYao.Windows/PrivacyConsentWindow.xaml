@@ -23,7 +23,7 @@
 
         <Border Grid.Row="2" Background="#160d2e" BorderBrush="#3a2a6e" BorderThickness="1"
                 CornerRadius="6" Padding="12,10" Margin="0,0,0,8">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" PanningMode="VerticalOnly">
                 <StackPanel>
                     <TextBlock Text="一、处理目的" FontSize="13" FontWeight="Bold" Foreground="#ECEAFF" Margin="0,0,0,3"/>
                     <TextBlock FontSize="12" Foreground="#C9C2EE" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,10">

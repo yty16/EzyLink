@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll"
     android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="vertical" android:padding="12dp"
         android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -18,6 +19,28 @@
         <EditText android:id="@+id/editMac" android:hint="@string/hint_mac"
             android:inputType="text" android:minHeight="44dp" android:layout_marginBottom="14dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="@string/conn_mode_label" android:textSize="12sp"
+            android:textColor="#ECEAFF" android:layout_marginBottom="2dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <RadioGroup android:id="@+id/radioMode" android:orientation="vertical"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/modeAuto" android:text="@string/mode_auto"
+                android:textSize="11sp" android:textColor="#ECEAFF" android:checked="true"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <RadioButton android:id="@+id/modeWifi" android:text="@string/mode_wifi"
+                android:textSize="11sp" android:textColor="#ECEAFF"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <RadioButton android:id="@+id/modeBt" android:text="@string/mode_bt"
+                android:textSize="11sp" android:textColor="#ECEAFF"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </RadioGroup>
+        <EditText android:id="@+id/editBtMac" android:hint="@string/hint_bt_mac"
+            android:inputType="text" android:minHeight="44dp" android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="@string/bt_help" android:textSize="9sp"
+            android:textColor="#9E9E9E" android:layout_marginBottom="14dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <CheckBox android:id="@+id/chkAutoConnect" android:text="@string/auto_connect"
             android:textSize="13sp" android:textColor="#ECEAFF" android:checked="true"
             android:minHeight="42dp" android:layout_marginBottom="6dp"
@@ -31,6 +54,15 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/btnSave" android:text="@string/save"
             android:minHeight="46dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:layout_marginBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnScanAdd" android:text="@string/devices_add_scan"
+            android:minHeight="44dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:layout_marginBottom="6dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/btnDelete" android:text="@string/devices_delete_title"
+            android:minHeight="44dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            style="@style/BtnDanger"/>
     </LinearLayout>
 </ScrollView>

@@ -8,6 +8,11 @@
     <!-- 扫码连接：本地相机取景并离线解码，不上传任何画面 -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <!-- 蓝牙 RFCOMM 直连：Android 12+ 需 BLUETOOTH_CONNECT 运行时权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
     <!-- 相机非必需：无摄像头设备仍可手动填 IP 连接 -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
@@ -24,6 +29,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".DeviceListActivity" android:exported="false"
+            android:label="@string/devices_title"
+            android:screenOrientation="portrait" />
         <activity android:name=".QrScannerActivity" android:exported="false"
             android:label="@string/scan_title"
             android:screenOrientation="nosensor"
