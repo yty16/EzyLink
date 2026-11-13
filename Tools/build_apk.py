@@ -37,7 +37,19 @@ ZIPALIGN = os.path.join(BT, "zipalign.exe")
 APKSIGNER = os.path.join(BT, "apksigner.bat")
 JAVA_HOME = os.environ.get("JAVA_HOME", r"C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot")
 KEYTOOL = os.path.join(JAVA_HOME, "bin", "keytool.exe")
-KEYSTORE = os.path.join(ROOT, "Tools", "debug.keystore")
+# 发布签名密钥（专用，替代调试密钥；便于商店更新签名一致、且非 debug 签名）
+KEYSTORE = os.path.join(ROOT, "Tools", "release.keystore")
+KEY_ALIAS = "ezykey"
+_KEYPASS_FILE = os.path.join(ROOT, "Tools", ".release_key_pass")
+
+
+def read_keypass():
+    # 口令存于本地未提交文件，避免明文进入仓库
+    if not os.path.exists(_KEYPASS_FILE):
+        raise SystemExit("缺少签名口令文件：%s（请重新生成 release.keystore）" % _KEYPASS_FILE)
+    with open(_KEYPASS_FILE, "r", encoding="ascii") as f:
+        return f.read().strip()
+
 
 # 三端版本号独立计数（a.b.c.d）：d=小改+1，b=更新+1
 VERSIONS = {
@@ -61,11 +73,7 @@ def run(cmd, cwd=None):
 def ensure_keystore():
     if os.path.exists(KEYSTORE):
         return
-    print("生成调试签名密钥：", KEYSTORE)
-    run([KEYTOOL, "-genkeypair", "-v", "-keystore", KEYSTORE, "-alias", "android",
-         "-keyalg", "RSA", "-keysize", "2048", "-validity", "10000",
-         "-storepass", "android", "-keypass", "android",
-         "-dname", "CN=YiTongYao,O=YiTongYao,C=CN"])
+    raise SystemExit("缺少发布签名密钥：%s（请运行 keytool 重新生成，别名 %s）" % (KEYSTORE, KEY_ALIAS))
 
 
 def sync_tree(source, target):
@@ -189,10 +197,11 @@ def build(mod):
     aligned = os.path.join(out, "aligned.apk")
     run([ZIPALIGN, "-p", "4", withdex, aligned])
 
-    # 7) apksigner 签名
+    # 7) apksigner 签名（发布密钥）
     staged_final = os.path.join(out, mod + "-release.apk")
-    run([APKSIGNER, "sign", "--ks", KEYSTORE, "--ks-key-alias", "android",
-         "--ks-pass", "pass:android", "--key-pass", "pass:android",
+    keypass = read_keypass()
+    run([APKSIGNER, "sign", "--ks", KEYSTORE, "--ks-key-alias", KEY_ALIAS,
+         "--ks-pass", "pass:" + keypass, "--key-pass", "pass:" + keypass,
          "--out", staged_final, aligned])
 
     # 拷回项目目录

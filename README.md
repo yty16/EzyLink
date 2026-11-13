@@ -29,10 +29,11 @@
 - `installer/` —— 构建出的 Windows 安装程序
 - `dist/` —— 便携版与两端 APK
 - `Protocol.md` —— 指令协议详细定义
-- `Tools/` —— 图标转换脚本 `convert_original_icon.py` 与 APK 构建脚本 `build_apk.py` / `build_apk.bat`
+- `Tools/` —— 图标生成脚本 `gen_icons.py`、APK 构建脚本 `build_apk.py` / `build_apk.bat`（图标与构建脚本说明见对应文件头部）
 - `CHANGELOG.md` —— 三端更新日志
 - `LICENSE` —— 许可证全文（**GPL-3.0**，GNU 通用公共许可证第 3 版）
 - `PRIVACY.md` —— 隐私政策（数据收集范围、本地存储、撤回同意等）
+- `STORE_LISTING.md` —— 应用商店上架资料（名称 / 介绍 / 功能 / 权限说明 / 隐私要点 / 关键词 / 素材），可直接复制到商城字段
 
 ## 安装包
 
