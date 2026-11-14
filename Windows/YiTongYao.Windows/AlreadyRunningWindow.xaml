@@ -1,0 +1,57 @@
+<Window x:Class="YiTongYao.Windows.AlreadyRunningWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="易通遥 EzyLink 已在运行" Height="312" Width="450"
+        Background="#1b1136" Foreground="#ECEAFF"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        WindowStyle="SingleBorderWindow" Topmost="True"
+        Icon="Assets\vty_icon.ico">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题行：应用图标 + 标题 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,14">
+            <Image Source="Assets\vty_icon.png" Width="28" Height="28" Margin="0,0,10,0"
+                   VerticalAlignment="Center"/>
+            <TextBlock Text="易通遥 EzyLink 已在运行" FontSize="16" FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- 内容 -->
+        <StackPanel Grid.Row="1" Orientation="Vertical">
+            <TextBlock TextWrapping="Wrap" LineHeight="21" FontSize="13">
+                易通遥 已经启动，请通过任务栏托盘图标进行设置等操作。
+            </TextBlock>
+            <TextBlock TextWrapping="Wrap" LineHeight="21" FontSize="13"
+                       Margin="0,10,0,0" Foreground="#C9C2EE">
+                如果您无法看到主界面，可能是因为您在托盘图标菜单中选择了「隐藏主界面」，或者有隐藏主界面的规则或行动正在生效。
+            </TextBlock>
+
+            <!-- 重启当前实例（蓝色链接样式） -->
+            <Button x:Name="RestartLink" Background="Transparent" BorderThickness="0"
+                    HorizontalAlignment="Left" Margin="0,18,0,0" Cursor="Hand"
+                    Click="RestartLink_Click" ToolTip="结束正在运行的实例，然后再次启动本实例">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#x21BB;" FontSize="15" Foreground="#5AA9FF"
+                               Margin="0,0,7,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="重启当前实例" Foreground="#5AA9FF" FontSize="13"
+                               TextDecorations="Underline"/>
+                </StackPanel>
+            </Button>
+            <TextBlock Text="结束正在运行的 易通遥 实例，然后再次启动本实例。"
+                       FontSize="11" Foreground="#9b93c4" Margin="24,3,0,0" TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- 底部按钮 -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Margin="0,14,0,0">
+            <Button x:Name="CancelBtn" Content="取消" Width="92" Height="32"
+                    Background="#2c2150" Foreground="#ECEAFF" BorderBrush="#3a2a6e"
+                    BorderThickness="1" Click="CancelBtn_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

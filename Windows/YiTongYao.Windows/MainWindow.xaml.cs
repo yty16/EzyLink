@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     // 推荐给设备连接的地址（移动热点地址优先）
     private string? _connectIp;
     private bool _reallyExit;
+    private bool _forcedExit;   // 由重复启动的实例发出「重启当前实例」指令时置位，绕过认证强制退出
     private bool _busy;
 
     // 选项加载期间抑制 Checked/Unchecked 回调，避免初始化时反复写注册表
@@ -679,6 +680,17 @@ public partial class MainWindow : Window
         Activate();
     }
 
+    /// <summary>供重复启动的实例调用：把已有主窗口提到前台（公开给 App 的 IPC 回调）。</summary>
+    internal void BringToFront() => ShowWindow();
+
+    /// <summary>供重复启动的实例「重启当前实例」调用：绕过安全认证直接退出，让出单实例互斥体。</summary>
+    internal void ForceClose()
+    {
+        _forcedExit = true;
+        _reallyExit = true;
+        Close();
+    }
+
     /// <summary>
     /// 启停服务。加防重入 + 按钮禁用：避免连续点击造成多个监听器争抢同一端口而抛异常。
     /// </summary>
@@ -969,14 +981,15 @@ public partial class MainWindow : Window
     private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
         // 托盘图标隐藏时关闭窗口即退出：此时没有托盘入口，继续驻留会导致程序无法唤出
-        if (!_reallyExit && _settings.MinimizeToTray && !_settings.HideTrayIcon)
+        if (!_reallyExit && !_forcedExit && _settings.MinimizeToTray && !_settings.HideTrayIcon)
         {
             e.Cancel = true;
             Hide();
             return;
         }
         // 退出前按认证方式要求验证；未通过则取消关闭（备用口令可兜底，不会把自己锁死）
-        if (!EnsureUnlocked(AuthOperation.Exit))
+        // 强制重启（_forcedExit）时跳过认证，直接退出
+        if (!_forcedExit && !EnsureUnlocked(AuthOperation.Exit))
         {
             e.Cancel = true;
             return;

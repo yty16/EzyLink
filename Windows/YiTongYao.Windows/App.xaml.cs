@@ -27,6 +27,43 @@ public partial class App : System.Windows.Application
         EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
             new RoutedEventHandler((sender, _) => { if (sender is Window w) FitWindow(w); }));
 
+        // ---- 单实例互斥：已有实例在运行时，通知它把窗口提到前台并弹出「已在运行」提示 ----
+        if (!YiTongYao.Core.SingleInstance.TryBecomePrimary())
+        {
+            YiTongYao.Core.SingleInstance.Signal("SHOW");
+            bool restart = false;
+            try
+            {
+                var dlg = new AlreadyRunningWindow();
+                restart = dlg.ShowDialog() == true;
+            }
+            catch { }
+
+            if (restart)
+            {
+                // 先通知主实例退出并释放互斥体，再等待本实例接管
+                YiTongYao.Core.SingleInstance.Signal("RESTART");
+                if (!WaitBecomePrimary())
+                {
+                    CrashLogger.LogRun("重启失败：无法接管单实例互斥体");
+                    Shutdown();
+                    return;
+                }
+                // 接管成功，继续往下以主实例身份启动
+            }
+            else
+            {
+                Shutdown();
+                return;
+            }
+        }
+
+        // 主实例：启动 IPC 监听（重复启动时用于把窗口提到前台 / 接收重启指令）
+        YiTongYao.Core.SingleInstance.StartServer(
+            onShow: () => Dispatcher.BeginInvoke(() => (_mainWindow as MainWindow)?.BringToFront()),
+            onRestart: () => Dispatcher.BeginInvoke(() => (_mainWindow as MainWindow)?.ForceClose()));
+        Exit += (_, _) => YiTongYao.Core.SingleInstance.Release();
+
         // 隐私同意闸门：首次启动（或已撤回同意）时先征求同意，未同意则不创建主窗口直接退出。
         // 注意 StartupUri 已移除，主窗口在此处显式创建，确保闸门先于任何服务 / 托盘初始化。
         var s = YiTongYao.Core.SettingsStore.Load();
@@ -46,7 +83,23 @@ public partial class App : System.Windows.Application
             CrashLogger.LogRun("已同意隐私政策");
         }
 
-        new MainWindow().Show();
+        _mainWindow = new MainWindow();
+        _mainWindow.Show();
+    }
+
+    private MainWindow? _mainWindow;
+
+    /// <summary>
+    /// 轮询等待成为主实例（主实例退出并释放互斥体后本实例才能接管）。最多约 6 秒。
+    /// </summary>
+    private static bool WaitBecomePrimary()
+    {
+        for (int i = 0; i < 60; i++)
+        {
+            if (YiTongYao.Core.SingleInstance.TryBecomePrimary()) return true;
+            System.Threading.Thread.Sleep(100);
+        }
+        return false;
     }
 
     /// <summary>把窗口限制在当前屏幕工作区内，超出时按比例缩小并移回可见范围。</summary>
