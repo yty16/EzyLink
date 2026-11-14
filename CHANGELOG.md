@@ -2,6 +2,14 @@
 
 ---
 
+## 未发布（文档整合）
+
+- 文档由 9 份精简为 5 份：`PRIVACY.md` / `TERMS.md` / `DISCLAIMER.md` 合并为 `LEGAL.md`（三部分），`Watch/README.md` / `Phone/README.md` 并入主 `README.md` 后删除
+- 保留 `README.md`、`LEGAL.md`、`Protocol.md`、`CHANGELOG.md`、`THIRD_PARTY_NOTICES.md`
+- 同步更新三端关于页、协议网关、安装器与构建配置中的文件引用；`LEGAL.md` 与 `THIRD_PARTY_NOTICES.md` 随程序和安装器发布
+
+---
+
 ## 未发布（第三方组件合规声明）
 
 - 新增 `THIRD_PARTY_NOTICES.md`：第三方组件权威清单（ZXing core / Apache-2.0、.NET 8 运行时及基础类库 / MIT）、归属声明、Apache-2.0 与 MIT 许可证全文、兼容性说明

@@ -1,4 +1,4 @@
-﻿<Window x:Class="YiTongYao.Windows.PrivacyConsentWindow"
+<Window x:Class="YiTongYao.Windows.PrivacyConsentWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="隐私告知与同意 · 易通遥 EzyLink" Height="760" Width="660"
@@ -78,7 +78,7 @@
 
                     <TextBlock Text="六、说明" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AppFg}" Margin="0,0,0,3"/>
                     <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,2">
-                        本告知构成《隐私政策》的核心内容，完整文本见项目内 PRIVACY.md。
+                        本告知构成《隐私政策》的核心内容，完整文本见项目内 LEGAL.md。
                     </TextBlock>
                     <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,2">
                         本软件不使用人脸识别，不采集任何生物特征信息。
@@ -92,7 +92,7 @@
                         · 关机 / 重启等操作具有破坏性，执行前请务必保存文件与数据；因使用本软件导致的任何数据丢失、系统损坏或间接损失，开发者不承担责任；
                     </TextBlock>
                     <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,10">
-                        · 你须仅在自己拥有或已获授权的设备上使用，严禁未授权控制或违法用途；相关责任由使用者自行承担。完整文本见仓库 DISCLAIMER.md。
+                        · 你须仅在自己拥有或已获授权的设备上使用，严禁未授权控制或违法用途；相关责任由使用者自行承担。完整文本见仓库 LEGAL.md。
                     </TextBlock>
 
                     <TextBlock Text="八、用户协议" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AppFg}" Margin="0,0,0,3"/>
@@ -103,7 +103,7 @@
                         · 本软件著作权归开发者所有，依仓库 LICENSE 分发；不收集任何个人信息，数据仅存本机与局域网；
                     </TextBlock>
                     <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,2">
-                        · 开发者保留修改协议的权利，继续使用即视为接受。完整文本见仓库 TERMS.md。
+                        · 开发者保留修改协议的权利，继续使用即视为接受。完整文本见仓库 LEGAL.md。
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>
@@ -134,7 +134,7 @@
         <StackPanel Grid.Row="6" Margin="0,2,0,0">
             <TextBlock FontSize="11" TextWrapping="Wrap" HorizontalAlignment="Center">
                 <Hyperlink x:Name="RepoLink" Click="RepoLink_Click">
-                    项目仓库（含完整《隐私政策》PRIVACY.md）
+                    项目仓库（含完整《隐私政策》LEGAL.md）
                 </Hyperlink>
             </TextBlock>
             <TextBlock FontSize="11" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,2,0,0">

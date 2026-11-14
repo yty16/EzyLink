@@ -1,4 +1,4 @@
-﻿
+
 ; Windows 安装器（NSIS MUI2）
 Unicode True
 SetCompressor lzma
@@ -163,7 +163,7 @@ Section "主程序（必需）" SEC_MAIN
   SetOutPath "$INSTDIR"
   File /r /x "*.nsi" /x "*.pdb" "${PROJECTROOT}\dist\publish\*.*"
   File "${PROJECTROOT}\LICENSE"
-  File "${PROJECTROOT}\PRIVACY.md"
+  File "${PROJECTROOT}\LEGAL.md"
   File "${PROJECTROOT}\THIRD_PARTY_NOTICES.md"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 

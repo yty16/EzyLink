@@ -11,8 +11,7 @@ public partial class AboutWindow : Window
 {
     private const string RepoUrl = "https://github.com/yty16/EzyLink";
     private const string DevUrl = "https://github.com/yty16";
-    private const string TermsUrl = "https://github.com/yty16/EzyLink/blob/main/TERMS.md";
-    private const string DisclaimerUrl = "https://github.com/yty16/EzyLink/blob/main/DISCLAIMER.md";
+    private const string LegalUrl = "https://github.com/yty16/EzyLink/blob/main/LEGAL.md";
 
     public AboutWindow()
     {
@@ -26,13 +25,11 @@ public partial class AboutWindow : Window
 
     private void RepoLink_Click(object sender, RoutedEventArgs e) => OpenUrl(RepoUrl);
     private void DevLink_Click(object sender, RoutedEventArgs e) => OpenUrl(DevUrl);
-    private void TermsLink_Click(object sender, RoutedEventArgs e) => OpenUrl(TermsUrl);
-    private void DisclaimerLink_Click(object sender, RoutedEventArgs e) => OpenUrl(DisclaimerUrl);
 
-    private void PrivacyLink_Click(object sender, RoutedEventArgs e)
+    private void LegalLink_Click(object sender, RoutedEventArgs e)
     {
-        if (!TryOpenLocal("PRIVACY.md"))
-            OpenUrl(RepoUrl + "/blob/main/PRIVACY.md");
+        if (!TryOpenLocal("LEGAL.md"))
+            OpenUrl(LegalUrl);
     }
 
     private void LicenseLink_Click(object sender, RoutedEventArgs e)

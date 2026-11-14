@@ -14,8 +14,8 @@ public class AboutActivity extends Activity {
     private static final String REPO_URL = "https://github.com/yty16/EzyLink";
     /** 开发者主页。 */
     private static final String DEV_URL = "https://github.com/yty16";
-    /** 隐私政策地址。 */
-    private static final String PRIVACY_URL = "https://github.com/yty16/EzyLink/blob/main/PRIVACY.md";
+    /** 法律文件地址。 */
+    private static final String LEGAL_URL = "https://github.com/yty16/EzyLink/blob/main/LEGAL.md";
     /** 第三方组件声明。 */
     private static final String NOTICES_URL = "https://github.com/yty16/EzyLink/blob/main/THIRD_PARTY_NOTICES.md";
 
@@ -34,7 +34,7 @@ public class AboutActivity extends Activity {
 
         bindLink(R.id.aboutRepo, REPO_URL);
         bindLink(R.id.aboutDeveloper, DEV_URL);
-        bindLink(R.id.aboutPrivacy, PRIVACY_URL);
+        bindLink(R.id.aboutPrivacy, LEGAL_URL);
         bindLink(R.id.aboutThirdParty, NOTICES_URL);
     }
 

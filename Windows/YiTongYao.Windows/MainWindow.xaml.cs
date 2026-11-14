@@ -373,7 +373,7 @@ public partial class MainWindow : Window
 
     private void PrivacyPolicyBtn_Click(object sender, RoutedEventArgs e)
     {
-        // 优先打开随程序发布的 PRIVACY.md，缺失时回退到仓库地址
+        // 优先打开随程序发布的 LEGAL.md，缺失时回退到仓库地址
         if (!PrivacyConsentWindow.TryOpenLocalPrivacy())
             PrivacyConsentWindow.OpenUrl("https://github.com/" + AppConstants.GitHubOwner
                                          + "/" + AppConstants.GitHubRepo);

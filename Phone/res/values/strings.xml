@@ -53,8 +53,8 @@
     <string name="disclaimer_title">一、免责声明</string>
     <string name="disclaimer_text">1. 本软件按「现状」提供，开发者已尽力确保功能正常，但不保证绝对无缺陷、无中断或适用于所有设备与环境，使用风险由你自行承担。\n2. 本软件可对已授权的电脑执行锁屏、睡眠、关机、重启、网络开机等远程操作，其中关机、重启具有破坏性。执行任何操作前，请务必自行保存好正在编辑的文件与数据。因使用本软件（含误操作、网络异常、设备故障等）导致的任何数据丢失、系统损坏或间接损失，开发者不承担任何责任。\n3. 你须确保仅在自己拥有或已获明确授权的设备与网络上使用本软件，严禁用于未经授权的访问、控制或任何违法用途；由此产生的一切责任由使用者自行承担。\n4. 因不可抗力、网络环境、第三方软硬件兼容性问题或你自身操作不当造成的损失，开发者不承担责任。\n5. 本软件不含任何恶意代码，但请务必通过官方渠道（本项目开源仓库及授权应用市场）获取；从非官方渠道下载使用导致的后果由你自行承担。</string>
     <string name="terms_title">二、用户协议</string>
-    <string name="terms_text">1. 使用本软件即表示你同意本协议全部条款。\n2. 使用限制：你仅可将本软件用于合法、已获授权的场景；严禁用于网络攻击、未授权控制、入侵他人设备或其他违反法律法规的行为。\n3. 连接信息安全：你保存在本机/手表端的电脑地址、配对码、蓝牙信息等均由你自行管理，请妥善保管，避免泄露。\n4. 知识产权：本软件著作权归开发者所有，依据仓库内 LICENSE 文件规定的许可协议分发，你可在协议范围内使用、修改与再分发。\n5. 隐私保护：本软件不收集任何个人信息，所有连接数据仅存储于你的本机与局域网内，详见《隐私政策》（PRIVACY.md）。\n6. 免责：除本协议另有约定外，软件相关的责任以《免责声明》为准。\n7. 协议变更：开发者保留根据法律法规或产品调整修改本协议的权利；你继续使用本软件即视为接受修订后的协议。\n8. 协议终止：若你违反本协议，开发者有权停止向你提供本软件且不承担任何责任。</string>
-    <string name="agree_note">完整文本以开源仓库（github.com/yty16/EzyLink）中的 TERMS.md 与 DISCLAIMER.md 为准。</string>
+    <string name="terms_text">1. 使用本软件即表示你同意本协议全部条款。\n2. 使用限制：你仅可将本软件用于合法、已获授权的场景；严禁用于网络攻击、未授权控制、入侵他人设备或其他违反法律法规的行为。\n3. 连接信息安全：你保存在本机/手表端的电脑地址、配对码、蓝牙信息等均由你自行管理，请妥善保管，避免泄露。\n4. 知识产权：本软件著作权归开发者所有，依据仓库内 LICENSE 文件规定的许可协议分发，你可在协议范围内使用、修改与再分发。\n5. 隐私保护：本软件不收集任何个人信息，所有连接数据仅存储于你的本机与局域网内，详见《隐私政策》（LEGAL.md）。\n6. 免责：除本协议另有约定外，软件相关的责任以《免责声明》为准。\n7. 协议变更：开发者保留根据法律法规或产品调整修改本协议的权利；你继续使用本软件即视为接受修订后的协议。\n8. 协议终止：若你违反本协议，开发者有权停止向你提供本软件且不承担任何责任。</string>
+    <string name="agree_note">完整文本以开源仓库（github.com/yty16/EzyLink）中的 LEGAL.md 为准。</string>
     <string name="agree_check">我已阅读并同意上述《用户协议》与《免责声明》</string>
     <string name="agree_accept">同意并继续</string>
     <string name="agree_decline">不同意并退出</string>
@@ -63,7 +63,7 @@
     <string name="about_desc">手机 / 手表远程控制电脑：PPT 放映、锁屏、睡眠、开关机、网络开机（WoL）。所有连接数据仅存储于你的本机与局域网内，不经过任何第三方服务器。</string>
     <string name="about_repo">开源仓库：github.com/yty16/EzyLink</string>
     <string name="about_developer">开发者：yty16</string>
-    <string name="about_privacy">隐私政策：PRIVACY.md</string>
+    <string name="about_privacy">法律文件（隐私 / 协议 / 免责）：LEGAL.md</string>
     <string name="about_license">许可证：GPL-3.0-or-later（详见 LICENSE）</string>
     <string name="about_third_party">第三方组件：ZXing core（Apache-2.0）｜详见 THIRD_PARTY_NOTICES.md</string>
 </resources>

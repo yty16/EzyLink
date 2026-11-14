@@ -33,11 +33,9 @@
 - `CHANGELOG.md` —— 三端更新日志
 - `LICENSE` —— 本软件许可证全文（**GPL-3.0-or-later**，GNU 通用公共许可证第 3 版，或（由你选择）任何更高版本）
 - `THIRD_PARTY_NOTICES.md` —— 第三方组件声明与许可证全文（Apache-2.0、MIT）
-- `PRIVACY.md` —— 隐私政策（数据收集范围、本地存储、撤回同意等）
-- `TERMS.md` —— 用户协议（使用限制、知识产权、责任限制等）
-- `DISCLAIMER.md` —— 免责声明（「现状」提供、远程操作破坏性提示、合法使用等）
+- `LEGAL.md` —— 法律文件（隐私政策 / 用户协议 / 免责声明三部分）
 
-> 法律文件：首次使用本软件时，移动端会弹出《用户协议与免责声明》网关、Windows 端会弹出《隐私告知与同意》（含《免责声明》与《用户协议》），**同意后方可使用**；应用内「关于」页与仓库均提供完整文本。
+> 法律文件：首次使用本软件时，移动端会弹出《用户协议与免责声明》网关、Windows 端会弹出《隐私告知与同意》（含《免责声明》与《用户协议》），**同意后方可使用**；应用内「关于」页与仓库均提供 `LEGAL.md` 完整文本。
 
 ## 安装包
 
@@ -311,7 +309,9 @@ python Tools/build_apk.py phone
 # 或直接双击 Tools/build_apk.bat
 ```
 
-产物落在 `Watch/watch-release.apk`、`Phone/phone-release.apk`。  
+产物落在 `Watch/watch-release.apk`、`Phone/phone-release.apk`。
+版本号（versionName + versionCode）在 `Tools/build_apk.py` 的 `VERSIONS` 字典统一管理。
+aapt2 对中文路径参数支持不佳，脚本会先把模块复制到 ASCII 临时目录 `C:/yty_build` 编译，再把 APK 拷回。
 安装到设备：
 
 ```bash
@@ -337,6 +337,7 @@ adb install Phone/phone-release.apk        # 手机
 - 指令示例：`ppt_next` / `ppt_start` / `ppt_exit` / `ppt_black` / `ppt_white` /  
   `lock` / `sleep` / `shutdown` / `restart`。
 - 元指令：`ping`、`info`（返回 IP/MAC/主机名）。
+- 每条指令单独建连（connect → auth → 指令 → 读响应），对间歇性连接更健壮。
 - 关机 / 重启为高危指令，移动端强制二次确认。
 
 ## 开机（Wake-on-LAN）
@@ -376,6 +377,6 @@ adb install Phone/phone-release.apk        # 手机
 
 **许可**
 
-本软件以 GNU 通用公共许可证 v3.0-or-later（GPL-3.0-or-later）发布，详见 `LICENSE`。您可以自由使用、研究、修改与再分发本软件（含商业用途）；衍生作品须以相同许可证（GPL-3.0-or-later）开源。隐私政策见 `PRIVACY.md`。 使用前请先在应用内同意隐私告知
+本软件以 GNU 通用公共许可证 v3.0-or-later（GPL-3.0-or-later）发布，详见 `LICENSE`。您可以自由使用、研究、修改与再分发本软件（含商业用途）；衍生作品须以相同许可证（GPL-3.0-or-later）开源。隐私政策见 `LEGAL.md`。 使用前请先在应用内同意隐私告知
 
 部分内容由AI大模型辅助完成

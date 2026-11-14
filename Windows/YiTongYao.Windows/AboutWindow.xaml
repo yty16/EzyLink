@@ -51,13 +51,9 @@
             <TextBlock FontSize="14" Foreground="{DynamicResource AppFg}" Margin="0,0,0,10">
                 <Hyperlink x:Name="DevLink" Click="DevLink_Click">yty16</Hyperlink>
             </TextBlock>
-            <TextBlock Text="隐私政策 / 用户协议 / 免责声明" Style="{StaticResource Label}" Margin="0,0,0,3"/>
+            <TextBlock Text="法律文件（隐私政策 / 用户协议 / 免责声明）" Style="{StaticResource Label}" Margin="0,0,0,3"/>
             <TextBlock FontSize="14" Foreground="{DynamicResource AppFg}" Margin="0,0,0,10">
-                <Hyperlink x:Name="PrivacyLink" Click="PrivacyLink_Click">PRIVACY.md</Hyperlink>
-                <Run Foreground="{DynamicResource AppFgDim}"> · </Run>
-                <Hyperlink x:Name="TermsLink" Click="TermsLink_Click">TERMS.md</Hyperlink>
-                <Run Foreground="{DynamicResource AppFgDim}"> · </Run>
-                <Hyperlink x:Name="DisclaimerLink" Click="DisclaimerLink_Click">DISCLAIMER.md</Hyperlink>
+                <Hyperlink x:Name="LegalLink" Click="LegalLink_Click">LEGAL.md</Hyperlink>
             </TextBlock>
             <TextBlock Text="许可证" Style="{StaticResource Label}" Margin="0,0,0,3"/>
             <TextBlock FontSize="14" Foreground="{DynamicResource AppFg}" Margin="0,0,0,10">

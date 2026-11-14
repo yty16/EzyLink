@@ -56,7 +56,7 @@ public partial class PrivacyConsentWindow : Window
 
     private void RepoLink_Click(object sender, RoutedEventArgs e)
     {
-        // 优先打开随程序发布的 PRIVACY.md；不存在时回退到仓库地址
+        // 优先打开随程序发布的 LEGAL.md；不存在时回退到仓库地址
         if (!TryOpenLocalPrivacy())
             OpenUrl("https://github.com/" + Core.AppConstants.GitHubOwner + "/" + Core.AppConstants.GitHubRepo);
     }
@@ -71,7 +71,7 @@ public partial class PrivacyConsentWindow : Window
         try
         {
             string dir = AppContext.BaseDirectory;
-            string path = Path.Combine(dir, "PRIVACY.md");
+            string path = Path.Combine(dir, "LEGAL.md");
             if (!File.Exists(path)) return false;
             Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
             return true;
