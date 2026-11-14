@@ -1,5 +1,4 @@
-
-; Windows 安装器（NSIS MUI2）
+﻿; Windows 安装器（NSIS MUI2）
 Unicode True
 SetCompressor lzma
 
