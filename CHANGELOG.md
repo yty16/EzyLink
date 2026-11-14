@@ -2,29 +2,11 @@
 
 ---
 
-## 未发布（文档整合）
+## 1.9.1.5
 
-- 文档由 9 份精简为 5 份：`PRIVACY.md` / `TERMS.md` / `DISCLAIMER.md` 合并为 `LEGAL.md`（三部分），`Watch/README.md` / `Phone/README.md` 并入主 `README.md` 后删除
-- 保留 `README.md`、`LEGAL.md`、`Protocol.md`、`CHANGELOG.md`、`THIRD_PARTY_NOTICES.md`
-- 同步更新三端关于页、协议网关、安装器与构建配置中的文件引用；`LEGAL.md` 与 `THIRD_PARTY_NOTICES.md` 随程序和安装器发布
-
----
-
-## 未发布（第三方组件合规声明）
-
-- 新增 `THIRD_PARTY_NOTICES.md`：第三方组件权威清单（ZXing core / Apache-2.0、.NET 8 运行时及基础类库 / MIT）、归属声明、Apache-2.0 与 MIT 许可证全文、兼容性说明
-- 三端「关于」页新增第三方组件入口：Windows 可打开本地声明文件，手机 / 手表点击跳转仓库声明页；许可证一栏统一标注 `GPL-3.0-or-later`
-- README / PRIVACY / Protocol 的第三方组件口径统一为同一张表，并统一引用 `THIRD_PARTY_NOTICES.md`
-- 安装器许可页补充说明并修正仓库地址；安装时随分发附带 `LICENSE`、`PRIVACY.md`、`THIRD_PARTY_NOTICES.md`
-- 全仓库自研代码注释精简为「只注明干什么」；ZXing 第三方库 102 个文件保留原始许可头与注释
-
----
-
-## 1.9.1.5（三端通用：首次使用合规网关 + 应用内关于页）
-
-- **合规与标准化**：首次使用新增《用户协议》与《免责声明》网关——移动端（手机 / 手表）在首次启动弹出协议网关，须勾选同意后方可进入；Windows 端《隐私告知与同意》补充《免责声明》与《用户协议》章节，须同时勾选两项方可继续
-- **关于页**：三端均新增「关于」入口（手机主界面与双方设置页、Windows 主界面按钮），展示应用名称、版本、简介、**开源仓库（github.com/yty16/EzyLink）**、**开发者（yty16）**、隐私政策与许可证，链接均可点击跳转
-- **仓库文档**：新增 `TERMS.md`（用户协议）与 `DISCLAIMER.md`（免责声明）作为准据文本，README 增加法律文件索引与上架提示
+- **合规与标准化**
+- **关于页**
+- **仓库文档**
 
 ---
 

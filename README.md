@@ -31,7 +31,7 @@
 - `Protocol.md` —— 指令协议详细定义
 - `Tools/` —— 图标生成脚本 `gen_icons.py`、APK 构建脚本 `build_apk.py` / `build_apk.bat`（图标与构建脚本说明见对应文件头部）
 - `CHANGELOG.md` —— 三端更新日志
-- `LICENSE` —— 本软件许可证全文（**GPL-3.0-or-later**，GNU 通用公共许可证第 3 版，或（由你选择）任何更高版本）
+- `LICENSE` —— 本软件许可证全文
 - `THIRD_PARTY_NOTICES.md` —— 第三方组件声明与许可证全文（Apache-2.0、MIT）
 - `LEGAL.md` —— 法律文件（隐私政策 / 用户协议 / 免责声明三部分）
 
@@ -309,9 +309,9 @@ python Tools/build_apk.py phone
 # 或直接双击 Tools/build_apk.bat
 ```
 
-产物落在 `Watch/watch-release.apk`、`Phone/phone-release.apk`。
-版本号（versionName + versionCode）在 `Tools/build_apk.py` 的 `VERSIONS` 字典统一管理。
-aapt2 对中文路径参数支持不佳，脚本会先把模块复制到 ASCII 临时目录 `C:/yty_build` 编译，再把 APK 拷回。
+产物落在 `Watch/watch-release.apk`、`Phone/phone-release.apk`。  
+版本号（versionName + versionCode）在 `Tools/build_apk.py` 的 `VERSIONS` 字典统一管理。  
+aapt2 对中文路径参数支持不佳，脚本会先把模块复制到 ASCII 临时目录 `C:/yty_build` 编译，再把 APK 拷回。  
 安装到设备：
 
 ```bash
@@ -364,10 +364,10 @@ adb install Phone/phone-release.apk        # 手机
 
 完整清单、归属声明与许可证全文见 **`THIRD_PARTY_NOTICES.md`**（本仓库第三方组件信息的唯一权威口径）。
 
-| 组件                             | 许可证        | 用途            | 位置                                                          |
-| ------------------------------ | ---------- | ------------- | ----------------------------------------------------------- |
-| ZXing core（`com.google.zxing`） | Apache-2.0 | 手表 / 手机端二维码识别 | `Watch/src/com/google/zxing/`、`Phone/src/com/google/zxing/` |
-| .NET 8 运行时及基础类库 | MIT | Windows 端运行环境（自包含发布时打包） | 随 Windows 自包含发布产物提供 |
+| 组件                             | 许可证        | 用途                      | 位置                                                          |
+| ------------------------------ | ---------- | ----------------------- | ----------------------------------------------------------- |
+| ZXing core（`com.google.zxing`） | Apache-2.0 | 手表 / 手机端二维码识别           | `Watch/src/com/google/zxing/`、`Phone/src/com/google/zxing/` |
+| .NET 8 运行时及基础类库                | MIT        | Windows 端运行环境（自包含发布时打包） | 随 Windows 自包含发布产物提供                                         |
 
 - ZXing 仅取用其**纯 Java 的 core 解码子集**（qrcode + common + reedsolomon），无任何外部依赖，  
   未引入 `android-core` / `android-integration` 等需要 AndroidX 的模块。
