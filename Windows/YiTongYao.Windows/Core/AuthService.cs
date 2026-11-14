@@ -100,7 +100,7 @@ internal static class AuthService
     private const string RecoveryAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
     private const int RecoveryBytes = 20;
 
-    // 生成本机一次性恢复码（160 位，分组便于抄写）
+    // 生成本机一次性恢复码
     public static string CreateRecoveryCode()
     {
         byte[] raw = RandomNumberGenerator.GetBytes(RecoveryBytes);
@@ -137,7 +137,7 @@ internal static class AuthService
         return sb.ToString();
     }
 
-    // 写入恢复码哈希；明文不落盘
+    // 写入恢复码哈希
     public static void SaveRecoveryCode(SettingsStore s, string code)
     {
         s.RecoveryCodeHash = HashSecret(NormalizeRecoveryCode(code));
