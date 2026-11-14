@@ -915,6 +915,20 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>打开「关于」窗口。</summary>
+    private void AboutBtn_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var win = new AboutWindow { Owner = this };
+            win.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            Log("打开关于窗口异常：" + ex.Message);
+        }
+    }
+
     /// <summary>
     /// 写日志。使用 BeginInvoke 异步投递 + 行数限流：
     /// 旧实现用同步 Dispatcher.Invoke，一旦后台高频写日志就会把 UI 线程堵死（窗口「未响应」）。

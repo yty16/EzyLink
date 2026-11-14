@@ -23,6 +23,7 @@
         </LinearLayout>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
             <Button android:id="@+id/btnDevices" style="@style/Btn" android:text="@string/devices_title"/>
+            <Button android:id="@+id/btnAbout" style="@style/Btn" android:text="@string/btn_about"/>
         </LinearLayout>
         <TextView android:id="@+id/scanHint" android:text="@string/scan_hint"
             android:textSize="12sp" android:textColor="#5f6b7a" android:layout_marginBottom="8dp"

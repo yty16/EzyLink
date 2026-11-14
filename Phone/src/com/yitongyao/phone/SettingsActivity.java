@@ -111,6 +111,13 @@ public class SettingsActivity extends Activity {
                 confirmDeleteCurrent();
             }
         });
+
+        Button about = findViewById(R.id.btnAbout);
+        about.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(SettingsActivity.this, AboutActivity.class));
+            }
+        });
     }
 
     /** 连接方式 */

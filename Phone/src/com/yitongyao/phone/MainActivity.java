@@ -58,6 +58,13 @@ public class MainActivity extends Activity {
         });
         try {
             super.onCreate(savedInstanceState);
+            // 首次使用须同意《用户协议》与《免责声明》，未同意则进入协议网关
+            prefs = getSharedPreferences("yity", Context.MODE_PRIVATE);
+            if (!prefs.getBoolean("eula_agreed", false)) {
+                startActivity(new Intent(MainActivity.this, AgreementActivity.class));
+                finish();
+                return;
+            }
             initUi();
         } catch (Throwable e) {
             showError(e);
@@ -102,6 +109,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 startActivityForResult(new Intent(MainActivity.this, DeviceListActivity.class),
                         REQ_DEVICES);
+            }
+        });
+        findViewById(R.id.btnAbout).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, AboutActivity.class));
             }
         });
         findViewById(R.id.btnScan).setOnClickListener(new View.OnClickListener() {

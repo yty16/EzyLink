@@ -1,0 +1,76 @@
+<Window x:Class="YiTongYao.Windows.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="关于 易通遥 EzyLink" Height="560" Width="640"
+        Background="#1b1136" Foreground="#ECEAFF"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Icon="Assets\vty_icon.ico">
+    <Window.Resources>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#9C93C9"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style x:Key="CardBtn" TargetType="Button">
+            <Setter Property="Background" Value="#3a2a6e"/>
+            <Setter Property="Foreground" Value="#ECEAFF"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Image Source="Assets\vty_icon.png" Width="56" Height="56" Margin="0,0,14,0"/>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="易通遥 远程控制" FontSize="24" FontWeight="Bold"/>
+                <TextBlock x:Name="VersionText" FontSize="13" Foreground="#9C93C9" Margin="0,2,0,0"/>
+                <TextBlock Text="EzyLink" FontSize="12" Foreground="#8a86a8"/>
+            </StackPanel>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" FontSize="13" Foreground="#C9C2EE" TextWrapping="Wrap"
+                   LineHeight="20" Margin="0,0,0,12">
+            手机 / 手表远程控制电脑：PPT 放映、锁屏、睡眠、开关机、网络开机（WoL）。
+            所有连接数据仅存储于你的本机与局域网内，不经过任何第三方服务器。
+        </TextBlock>
+
+        <StackPanel Grid.Row="2" Orientation="Vertical" Margin="0,0,0,8">
+            <TextBlock Text="开源仓库" Style="{StaticResource Label}" Margin="0,0,0,3"/>
+            <TextBlock FontSize="14" Foreground="#ECEAFF" Margin="0,0,0,10">
+                <Hyperlink x:Name="RepoLink" Click="RepoLink_Click">github.com/yty16/EzyLink</Hyperlink>
+            </TextBlock>
+            <TextBlock Text="开发者" Style="{StaticResource Label}" Margin="0,0,0,3"/>
+            <TextBlock FontSize="14" Foreground="#ECEAFF" Margin="0,0,0,10">
+                <Hyperlink x:Name="DevLink" Click="DevLink_Click">yty16</Hyperlink>
+            </TextBlock>
+            <TextBlock Text="隐私政策 / 用户协议 / 免责声明" Style="{StaticResource Label}" Margin="0,0,0,3"/>
+            <TextBlock FontSize="14" Foreground="#ECEAFF" Margin="0,0,0,10">
+                <Hyperlink x:Name="PrivacyLink" Click="PrivacyLink_Click">PRIVACY.md</Hyperlink>
+                <Run Foreground="#7d73a8"> · </Run>
+                <Hyperlink x:Name="TermsLink" Click="TermsLink_Click">TERMS.md</Hyperlink>
+                <Run Foreground="#7d73a8"> · </Run>
+                <Hyperlink x:Name="DisclaimerLink" Click="DisclaimerLink_Click">DISCLAIMER.md</Hyperlink>
+            </TextBlock>
+            <TextBlock Text="许可证" Style="{StaticResource Label}" Margin="0,0,0,3"/>
+            <TextBlock FontSize="14" Foreground="#ECEAFF">
+                <Hyperlink x:Name="LicenseLink" Click="LicenseLink_Click">详见仓库 LICENSE</Hyperlink>
+            </TextBlock>
+        </StackPanel>
+
+        <TextBlock Grid.Row="3" FontSize="11" Foreground="#7d73a8" TextWrapping="Wrap"
+                   VerticalAlignment="Bottom">
+            本软件以「现状」提供，使用风险由使用者自行承担。点击上方链接将在默认浏览器中打开对应页面。
+        </TextBlock>
+
+        <Button Grid.Row="4" x:Name="CloseBtn" Content="关闭" HorizontalAlignment="Right"
+                Style="{StaticResource CardBtn}" Padding="18,8" Click="CloseBtn_Click"/>
+    </Grid>
+</Window>

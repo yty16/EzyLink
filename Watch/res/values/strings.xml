@@ -39,4 +39,23 @@
     <string name="devices_switched">已切换设备</string>
     <string name="devices_delete_title">删除设备</string>
     <string name="devices_delete_msg">确定删除这台电脑吗？</string>
+    <!-- 首次使用：用户协议与免责声明 -->
+    <string name="btn_about">关于</string>
+    <string name="agree_title">用户协议与免责声明</string>
+    <string name="agree_intro">首次使用前请阅读《用户协议》与《免责声明》。点「同意并继续」即表示你已阅读并同意全部内容。</string>
+    <string name="disclaimer_title">一、免责声明</string>
+    <string name="disclaimer_text">1. 本软件按「现状」提供，不保证绝对无缺陷或无中断，使用风险由你自行承担。\n2. 本软件可对被授权电脑执行锁屏、睡眠、关机、重启、网络开机等远程操作，其中关机、重启具有破坏性；执行前请务必保存好文件与数据。因使用本软件导致的任何数据丢失、系统损坏或间接损失，开发者不承担责任。\n3. 你须仅在自己拥有或已获授权的设备与网络上使用本软件，严禁用于未经授权的访问、控制或违法用途；相关责任由使用者自行承担。\n4. 因不可抗力、网络环境、第三方软硬件兼容性或你自身操作不当导致的损失，开发者不承担责任。\n5. 本软件不含恶意代码，请通过官方渠道（开源仓库及授权应用市场）获取。</string>
+    <string name="terms_title">二、用户协议</string>
+    <string name="terms_text">1. 使用本软件即表示你同意本协议全部条款。\n2. 使用限制：仅可用于合法、已获授权的场景；严禁用于网络攻击、未授权控制或违法用途。\n3. 连接信息安全：你保存在本机的电脑地址、配对码、蓝牙信息等由你自行管理，请妥善保管。\n4. 知识产权：本软件著作权归开发者所有，依仓库 LICENSE 规定的许可协议分发。\n5. 隐私保护：不收集任何个人信息，数据仅存于本机与局域网，详见 PRIVACY.md。\n6. 免责：以《免责声明》为准。\n7. 协议变更：开发者保留修改权利，继续使用即视为接受。\n8. 协议终止：若违反协议，开发者有权停止提供本软件。</string>
+    <string name="agree_note">完整文本见开源仓库（github.com/yty16/EzyLink）TERMS.md 与 DISCLAIMER.md。</string>
+    <string name="agree_check">我已阅读并同意《用户协议》与《免责声明》</string>
+    <string name="agree_accept">同意并继续</string>
+    <string name="agree_decline">不同意并退出</string>
+    <!-- 关于 -->
+    <string name="about_title">关于 易通遥</string>
+    <string name="about_desc">手表远程控制电脑：PPT 放映、锁屏、睡眠、开关机、网络开机。数据仅存本机与局域网，不经过第三方服务器。</string>
+    <string name="about_repo">开源仓库：github.com/yty16/EzyLink</string>
+    <string name="about_developer">开发者：yty16</string>
+    <string name="about_privacy">隐私政策：PRIVACY.md</string>
+    <string name="about_license">许可证：详见仓库 LICENSE</string>
 </resources>

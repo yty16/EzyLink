@@ -33,6 +33,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity" android:exported="false" />
+        <activity android:name=".AgreementActivity" android:exported="false"
+            android:screenOrientation="nosensor" />
+        <activity android:name=".AboutActivity" android:exported="false"
+            android:screenOrientation="nosensor" />
         <activity android:name=".DeviceListActivity" android:exported="false"
             android:label="@string/devices_title"
             android:screenOrientation="nosensor" />

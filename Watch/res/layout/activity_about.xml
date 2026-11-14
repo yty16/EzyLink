@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="@dimen/scr_pad"
+        android:gravity="center_horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="@string/app_name" android:textSize="14sp"
+            android:textStyle="bold" android:textColor="#36E2E8"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/aboutVersion" android:text="" android:textSize="10sp"
+            android:textColor="#36E2E8" android:layout_marginBottom="6dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="@string/about_desc" android:textSize="9sp"
+            android:textColor="#C9C2EE" android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/aboutRepo" android:text="@string/about_repo"
+            android:textSize="9sp" android:textColor="#ECEAFF" android:clickable="true"
+            android:focusable="true" android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/aboutDeveloper" android:text="@string/about_developer"
+            android:textSize="9sp" android:textColor="#ECEAFF" android:clickable="true"
+            android:focusable="true" android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/aboutPrivacy" android:text="@string/about_privacy"
+            android:textSize="9sp" android:textColor="#ECEAFF" android:clickable="true"
+            android:focusable="true" android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/aboutLicense" android:text="@string/about_license"
+            android:textSize="9sp" android:textColor="#ECEAFF"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</ScrollView>

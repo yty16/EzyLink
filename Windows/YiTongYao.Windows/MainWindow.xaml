@@ -89,6 +89,8 @@
             <TextBlock x:Name="VersionText" FontSize="12" Foreground="#9C93C9" VerticalAlignment="Center" Margin="10,0,0,0"/>
             <Button x:Name="CheckUpdateBtn" Content="检查更新" Style="{StaticResource AccentBtn}"
                     Background="#3a2a6e" Foreground="#ECEAFF" Margin="14,0,0,0" Click="CheckUpdateBtn_Click"/>
+            <Button x:Name="AboutBtn" Content="关于" Style="{StaticResource AccentBtn}"
+                    Background="#3a2a6e" Foreground="#ECEAFF" Margin="10,0,0,0" Click="AboutBtn_Click"/>
         </StackPanel>
 
         <Border Grid.Row="1" Style="{StaticResource Card}">

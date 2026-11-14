@@ -64,5 +64,9 @@
             android:minHeight="48dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"
             style="@style/BtnDanger"/>
+        <Button android:id="@+id/btnAbout" android:text="@string/btn_about"
+            android:minHeight="48dp" android:layout_marginTop="8dp"
+            android:textColor="#11102A" android:background="#36E2E8"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
     </LinearLayout>
 </ScrollView>

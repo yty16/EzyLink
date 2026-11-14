@@ -33,13 +33,16 @@ public partial class PrivacyConsentWindow : Window
     private void RefreshButtons()
     {
         bool policy = PolicyCheck.IsChecked == true;
-        AcceptBtn.IsEnabled = policy;
-        HintText.Text = policy
+        bool terms = TermsCheck.IsChecked == true;
+        AcceptBtn.IsEnabled = policy && terms;
+        HintText.Text = (policy && terms)
             ? "点击「同意并继续」后即可使用本软件；你随时可在主界面「隐私与授权」区撤回同意。"
-            : "请先勾选「我已阅读并同意《隐私政策》」后，方可点击「同意并继续」。";
+            : "请先勾选「我已阅读并同意《隐私政策》」与「我已阅读并同意《免责声明》与《用户协议》」后，方可点击「同意并继续」。";
     }
 
     private void PolicyCheck_Changed(object sender, RoutedEventArgs e) => RefreshButtons();
+
+    private void TermsCheck_Changed(object sender, RoutedEventArgs e) => RefreshButtons();
 
     private void AcceptBtn_Click(object sender, RoutedEventArgs e)
     {
