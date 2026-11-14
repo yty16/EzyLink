@@ -22,3 +22,7 @@ Tools/.release_key_pass
 
 # 仅本地文档（不推送到公开仓库）
 /VERSION
+
+# 应用商店上架资料（不推送到公开仓库）
+/STORE_LISTING.md
+dist/*.png
