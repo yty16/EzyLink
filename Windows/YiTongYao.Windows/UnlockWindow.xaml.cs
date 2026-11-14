@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using YiTongYao.Core;
 
@@ -179,7 +180,25 @@ public partial class UnlockWindow : Window
         _busy = true;
         HintText.Text = "正在调用系统验证…";
         HintText.Visibility = Visibility.Visible;
-        var (ok, msg) = await SystemUnlockService.VerifyAsync("易通遥需要验证以继续");
+        // 系统凭据弹窗需置于本窗口之上：验证期间取消置顶，并把本窗口作为父窗口
+        bool wasTopmost = Topmost;
+        Topmost = false;
+        bool ok;
+        string msg;
+        try
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            (ok, msg) = await SystemUnlockService.VerifyAsync("易通遥需要验证以继续", hwnd);
+        }
+        catch (Exception ex)
+        {
+            ok = false;
+            msg = "系统解锁调用失败：" + ex.Message;
+        }
+        finally
+        {
+            Topmost = wasTopmost;
+        }
         _busy = false;
         if (ok)
         {

@@ -30,7 +30,7 @@ internal static class SystemUnlockService
 
     public static bool IsSupported() => OperatingSystem.IsWindows();
 
-    public static Task<(bool ok, string message)> VerifyAsync(string message)
+    public static Task<(bool ok, string message)> VerifyAsync(string message, IntPtr parentHwnd)
     {
         return Task.Run(() =>
         {
@@ -42,6 +42,7 @@ internal static class SystemUnlockService
                 var ui = new CreduiInfo
                 {
                     cbSize = Marshal.SizeOf<CreduiInfo>(),
+                    hwndParent = parentHwnd,
                     pszMessageText = message ?? "易通遥需要验证以继续",
                     pszCaptionText = "易通遥 - 系统解锁"
                 };
