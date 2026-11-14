@@ -12,7 +12,7 @@ SetCompressor lzma
 
 !define APPNAME "易通遥"
 !define APPNAMEEN "YiTongYao"
-!define APPVERSION "1.9.1.4"
+!define APPVERSION "1.9.1.5"
 !define PUBLISHER "yty16"
 !define EXENAME "YiTongYao.exe"
 !define APPDIR "$LOCALAPPDATA\Programs\${APPNAME}"

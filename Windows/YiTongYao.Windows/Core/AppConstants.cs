@@ -24,5 +24,5 @@ internal static class AppConstants
     // 内部产品标识（Base64），仅用于构建/分发溯源，不做任何鉴权用途。
     internal const string ProductCode = "eXR5MTY=";
 
-    public const string Version = "1.9.1.4";
+    public const string Version = "1.9.1.5";
 }
