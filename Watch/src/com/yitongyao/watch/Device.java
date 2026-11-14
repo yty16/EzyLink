@@ -5,19 +5,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.UUID;
 
-/**
- * 一台「被控电脑」的连接档案。
- *
- * 客户端（手表 / 手机）可以保存多台电脑，并在它们之间自由切换：
- * 每一台对应一条 {@link Device} 记录，切换时把选中记录的字段写入连接设置区（SharedPreferences 旧键），
- * {@link com.yitongyao.watch.ConnectionManager} 无需改动即可用新设置重连。
- */
+/** 一台「被控电脑」的连接档案。*/
 public final class Device {
 
-    /** 唯一标识，用于列表内去重与切换。 */
+    /** 唯一标识。*/
     public String id = UUID.randomUUID().toString();
 
-    /** 显示名（默认按 IP 生成，可在设置中改）。 */
+    /** 显示名。*/
     public String name = "";
 
     /** 电脑 IP。 */
@@ -29,13 +23,13 @@ public final class Device {
     /** 配对码。 */
     public String token = "";
 
-    /** 电脑蓝牙 MAC（蓝牙直连用）。 */
+    /** 电脑蓝牙 MAC。*/
     public String btMac = "";
 
-    /** 电脑蓝牙服务 UUID（蓝牙直连用）。 */
+    /** 电脑蓝牙服务 UUID。*/
     public String btUuid = "";
 
-    /** 电脑 MAC（网络开机 WoL 用，每台电脑不同）。 */
+    /** 电脑 MAC。*/
     public String mac = "";
 
     /** 连接方式：auto / wifi / bt。 */
@@ -44,10 +38,10 @@ public final class Device {
     /** 打开应用时自动连接本设备。 */
     public boolean autoConnect = true;
 
-    /** 上次连上的时间（本机毫秒，仅记录用）。 */
+    /** 上次连上的时间。*/
     public long lastConnected = 0;
 
-    /** 上次连上的目标描述（IP / 蓝牙名）。 */
+    /** 上次连上的目标描述。*/
     public String lastTarget = "";
 
     /** 内部构建令牌（一致性校验用，勿改动）。 */
@@ -93,7 +87,7 @@ public final class Device {
         return d;
     }
 
-    /** 从旧的单一连接设置（SharedPreferences 旧键）迁移出一台设备。无 IP 时返回 null。 */
+    /** 从旧设置迁移出一台设备。*/
     public static Device fromLegacy(SharedPreferences prefs) {
         String ip = prefs.getString("ip", "");
         if (ip == null || ip.isEmpty()) return null;
@@ -110,10 +104,7 @@ public final class Device {
         return d;
     }
 
-    /**
-     * 解析电脑端二维码，生成一台设备（无法识别时返回 null）。
-     * 支持标准格式 YTY1|IP|端口|配对码[|蓝牙MAC]，并容错「IP:端口|配对码」等写法。
-     */
+    /** 解析二维码生成设备。*/
     public static Device fromQr(String text) {
         if (text == null) return null;
         String t = text.trim();
