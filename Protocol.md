@@ -156,6 +156,7 @@ YTY1|192.168.137.1|7788|12345678|4C:0F:3E:27:D4:AD
 
 > 二维码生成：Windows 端 `Core/QrEncoder.cs`（自带实现，无第三方库）。
 > 二维码识别：移动端内嵌 ZXing core（`com.google.zxing`，Apache-2.0，纯 Java，无外部依赖）。
+> 第三方组件完整清单与许可证全文见 `THIRD_PARTY_NOTICES.md`。
 
 ## 连接保持
 

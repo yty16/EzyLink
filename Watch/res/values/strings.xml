@@ -57,5 +57,6 @@
     <string name="about_repo">开源仓库：github.com/yty16/EzyLink</string>
     <string name="about_developer">开发者：yty16</string>
     <string name="about_privacy">隐私政策：PRIVACY.md</string>
-    <string name="about_license">许可证：详见仓库 LICENSE</string>
+    <string name="about_license">许可证：GPL-3.0-or-later（详见 LICENSE）</string>
+    <string name="about_third_party">第三方组件：ZXing core（Apache-2.0）｜详见 THIRD_PARTY_NOTICES.md</string>
 </resources>

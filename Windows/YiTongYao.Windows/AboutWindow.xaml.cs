@@ -41,6 +41,12 @@ public partial class AboutWindow : Window
             OpenUrl(RepoUrl + "/blob/main/LICENSE");
     }
 
+    private void NoticesLink_Click(object sender, RoutedEventArgs e)
+    {
+        if (!TryOpenLocal("THIRD_PARTY_NOTICES.md"))
+            OpenUrl(RepoUrl + "/blob/main/THIRD_PARTY_NOTICES.md");
+    }
+
     private static bool TryOpenLocal(string fileName)
     {
         try

@@ -162,6 +162,9 @@ Section "主程序（必需）" SEC_MAIN
 
   SetOutPath "$INSTDIR"
   File /r /x "*.nsi" /x "*.pdb" "${PROJECTROOT}\dist\publish\*.*"
+  File "${PROJECTROOT}\LICENSE"
+  File "${PROJECTROOT}\PRIVACY.md"
+  File "${PROJECTROOT}\THIRD_PARTY_NOTICES.md"
   WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   ${If} $isFreshInstall == 1

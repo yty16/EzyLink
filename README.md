@@ -31,7 +31,8 @@
 - `Protocol.md` —— 指令协议详细定义
 - `Tools/` —— 图标生成脚本 `gen_icons.py`、APK 构建脚本 `build_apk.py` / `build_apk.bat`（图标与构建脚本说明见对应文件头部）
 - `CHANGELOG.md` —— 三端更新日志
-- `LICENSE` —— 许可证全文（**GPL-3.0-or-later**，GNU 通用公共许可证第 3 版，或（由你选择）任何更高版本）
+- `LICENSE` —— 本软件许可证全文（**GPL-3.0-or-later**，GNU 通用公共许可证第 3 版，或（由你选择）任何更高版本）
+- `THIRD_PARTY_NOTICES.md` —— 第三方组件声明与许可证全文（Apache-2.0、MIT）
 - `PRIVACY.md` —— 隐私政策（数据收集范围、本地存储、撤回同意等）
 - `TERMS.md` —— 用户协议（使用限制、知识产权、责任限制等）
 - `DISCLAIMER.md` —— 免责声明（「现状」提供、远程操作破坏性提示、合法使用等）
@@ -360,14 +361,18 @@ adb install Phone/phone-release.apk        # 手机
 
 ## 第三方组件
 
+完整清单、归属声明与许可证全文见 **`THIRD_PARTY_NOTICES.md`**（本仓库第三方组件信息的唯一权威口径）。
+
 | 组件                             | 许可证        | 用途            | 位置                                                          |
 | ------------------------------ | ---------- | ------------- | ----------------------------------------------------------- |
 | ZXing core（`com.google.zxing`） | Apache-2.0 | 手表 / 手机端二维码识别 | `Watch/src/com/google/zxing/`、`Phone/src/com/google/zxing/` |
+| .NET 8 运行时及基础类库 | MIT | Windows 端运行环境（自包含发布时打包） | 随 Windows 自包含发布产物提供 |
 
-- 仅取用其**纯 Java 的 core 解码子集**（qrcode + common + reedsolomon），无任何外部依赖，  
+- ZXing 仅取用其**纯 Java 的 core 解码子集**（qrcode + common + reedsolomon），无任何外部依赖，  
   未引入 `android-core` / `android-integration` 等需要 AndroidX 的模块。
-- 未做裁剪之外的修改，保留原始许可证头。
+- ZXing 除子集裁剪外未作修改，保留全部原始许可证头。
 - Windows 端二维码生成**不使用**第三方库，为本项目自带实现（`Core/QrEncoder.cs`）。
+- 第三方组件各自遵循其原许可证；`Apache-2.0` 与 `MIT` 均与 `GPLv3` 兼容。
 
 **许可**
 
