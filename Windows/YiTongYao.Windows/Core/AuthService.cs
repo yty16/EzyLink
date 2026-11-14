@@ -17,11 +17,6 @@ internal static class AuthService
     // 连续失败达到上限后的锁定阶梯（分钟），逐级递增
     private static readonly int[] LockoutMinutes = { 1, 5, 10, 30, 60, 120, 240 };
 
-    // 备用解锁口令：只存其 PBKDF2 哈希与专用 Pepper，明文不进代码、不进产物
-    private static readonly byte[] Pepper = Convert.FromBase64String("J202OiBd0ul/5UNY0mKc0A==");
-    private static readonly byte[] SuperHash =
-        Convert.FromBase64String("SirLDMcnC5/FplHH7t3AIUaTu+WJo3Ue5RnDVwGjw1Y=");
-
     public static SettingsStore? Settings { get; set; }
 
     // ---------- 会话 ----------
@@ -101,19 +96,68 @@ internal static class AuthService
         return CryptographicOperations.FixedTimeEquals(expected, actual);
     }
 
-    // 备用解锁口令：任何验证入口都接受，用于在遗忘密码 / U 盘丢失时兜底
-    public static bool VerifySuper(string input)
+    // Crockford Base32 字母表
+    private const string RecoveryAlphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+    private const int RecoveryBytes = 20;
+
+    // 生成本机一次性恢复码（160 位，分组便于抄写）
+    public static string CreateRecoveryCode()
     {
-        if (string.IsNullOrEmpty(input)) return false;
-        byte[] actual = Pbkdf2(input, Pepper);
-        return CryptographicOperations.FixedTimeEquals(actual, SuperHash);
+        byte[] raw = RandomNumberGenerator.GetBytes(RecoveryBytes);
+        int acc = 0, bits = 0;
+        var sb = new StringBuilder();
+        foreach (byte b in raw)
+        {
+            acc = (acc << 8) | b;
+            bits += 8;
+            while (bits >= 5)
+            {
+                bits -= 5;
+                sb.Append(RecoveryAlphabet[(acc >> bits) & 31]);
+                acc &= (1 << bits) - 1;
+            }
+        }
+        if (bits > 0) sb.Append(RecoveryAlphabet[(acc << (5 - bits)) & 31]);
+        string s = sb.ToString();
+        return string.Join("-", Enumerable.Range(0, (s.Length + 3) / 4)
+            .Select(i => s.Substring(i * 4, Math.Min(4, s.Length - i * 4))));
+    }
+
+    // 恢复码输入归一化
+    public static string NormalizeRecoveryCode(string input)
+    {
+        var sb = new StringBuilder();
+        foreach (char c in input)
+        {
+            char u = char.ToUpperInvariant(c);
+            if (u == 'O') u = '0';
+            else if (u == 'I' || u == 'L') u = '1';
+            if (RecoveryAlphabet.IndexOf(u) >= 0) sb.Append(u);
+        }
+        return sb.ToString();
+    }
+
+    // 写入恢复码哈希；明文不落盘
+    public static void SaveRecoveryCode(SettingsStore s, string code)
+    {
+        s.RecoveryCodeHash = HashSecret(NormalizeRecoveryCode(code));
+        s.RecoveryCodeShown = true;
+        s.Save();
+    }
+
+    // 校验本机恢复码
+    public static bool VerifyRecoveryCode(string input)
+    {
+        var stored = Settings?.RecoveryCodeHash;
+        if (string.IsNullOrEmpty(stored) || string.IsNullOrEmpty(input)) return false;
+        return VerifySecret(stored, NormalizeRecoveryCode(input));
     }
 
     // ---------- 解锁尝试 ----------
 
     public static bool TryUnlock(string stored, string input)
     {
-        if (VerifySuper(input))
+        if (VerifyRecoveryCode(input))
         {
             ResetLockout();
             SetSessionUnlocked();
@@ -132,7 +176,7 @@ internal static class AuthService
     public static bool TryRecover(string answerHash, string answer)
     {
         if (string.IsNullOrEmpty(answerHash)) return false;
-        if (VerifySuper(answer)) { ResetLockout(); return true; }
+        if (VerifyRecoveryCode(answer)) { ResetLockout(); return true; }
         if (VerifySecret(answerHash, answer)) { ResetLockout(); return true; }
         return false;
     }

@@ -88,6 +88,30 @@ public partial class App : System.Windows.Application
             CrashLogger.LogRun("已同意隐私政策");
         }
 
+        // 首次启动生成本机一次性恢复码（固定备用口令已移除）
+        YiTongYao.Core.AuthService.Settings = s;
+        if (!s.RecoveryCodeShown)
+        {
+            try
+            {
+                string code = YiTongYao.Core.AuthService.CreateRecoveryCode();
+                var win = new RecoveryCodeWindow(code);
+                win.ShowDialog();
+                if (win.DialogResult == true)
+                    YiTongYao.Core.AuthService.SaveRecoveryCode(s, code);
+                else if (win.Skipped)
+                {
+                    s.RecoveryCodeShown = true;
+                    s.Save();
+                }
+                // 误关窗口时下次启动重新生成
+            }
+            catch (Exception ex)
+            {
+                CrashLogger.LogRun("恢复码生成失败：" + ex.Message);
+            }
+        }
+
         _mainWindow = new MainWindow();
         _mainWindow.Show();
     }

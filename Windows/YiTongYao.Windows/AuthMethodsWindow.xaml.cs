@@ -23,6 +23,7 @@ public partial class AuthMethodsWindow : Window
         _repaired = AuthService.NormalizeOperations(s);
         if (_repaired) s.Save();
         BuildOpsChecks();
+        RefreshRecoveryUi();
         RefreshList();
         _loading = true;
         TwoFactorBox.IsChecked = _s.TwoFactorEnabled;
@@ -292,6 +293,30 @@ public partial class AuthMethodsWindow : Window
         _s.AuthMethods.Remove(m);
         _s.Save();
         RefreshList();
+    }
+
+    private void RefreshRecoveryUi()
+        => RegenCodeBtn.Content = string.IsNullOrEmpty(_s.RecoveryCodeHash)
+            ? "生成恢复码" : "重新生成恢复码";
+
+    private void RegenCodeBtn_Click(object sender, RoutedEventArgs e)
+    {
+        bool has = !string.IsNullOrEmpty(_s.RecoveryCodeHash);
+        if (has)
+        {
+            var r = System.Windows.MessageBox.Show(this,
+                "重新生成后，当前恢复码立即失效。确定继续吗？", "易通遥 安全认证",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (r != MessageBoxResult.Yes) return;
+        }
+
+        string code = AuthService.CreateRecoveryCode();
+        var win = new RecoveryCodeWindow(code, regenerate: has) { Owner = this };
+        if (win.ShowDialog() == true)
+        {
+            AuthService.SaveRecoveryCode(_s, code);
+            RefreshRecoveryUi();
+        }
     }
 
     private void CloseBtn_Click(object sender, RoutedEventArgs e)

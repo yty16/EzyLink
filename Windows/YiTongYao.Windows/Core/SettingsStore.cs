@@ -71,6 +71,12 @@ internal sealed class SettingsStore
     /// <summary>当前锁定阶梯层级（决定下一次锁定时长）。</summary>
     public int PasswordLockoutLevel { get; set; } = 0;
 
+    /// <summary>本机恢复码的加盐哈希（salt:hash），明文不落盘。</summary>
+    public string RecoveryCodeHash { get; set; } = "";
+
+    /// <summary>恢复码是否已展示并确认保存；false 时下次启动重新生成。</summary>
+    public bool RecoveryCodeShown { get; set; } = false;
+
     // 旧版单密码字段：仅用于把 1.5.x 的密码迁移到认证方式列表，迁移后不再写入
     public string PasswordHash { get; set; } = "";
     public string SecurityQuestion { get; set; } = "";
