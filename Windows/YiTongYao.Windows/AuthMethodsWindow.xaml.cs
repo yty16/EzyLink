@@ -13,12 +13,15 @@ public partial class AuthMethodsWindow : Window
     private readonly SettingsStore _s;
     private readonly List<CheckBox> _opsChecks = new();
     private bool _loading;
+    private bool _repaired;
 
     internal AuthMethodsWindow(SettingsStore s)
     {
         InitializeComponent();
         _s = s;
         AuthService.Settings = s;
+        _repaired = AuthService.NormalizeOperations(s);
+        if (_repaired) s.Save();
         BuildOpsChecks();
         RefreshList();
         _loading = true;
@@ -60,14 +63,32 @@ public partial class AuthMethodsWindow : Window
     private void RefreshOps()
     {
         var m = Selected();
+        var master = AuthService.Master(_s);
+        bool isMaster = m != null && ReferenceEquals(m, master);
         OpsTitle.Text = m == null ? "保护的操作（先选择一种认证方式）"
-                                  : "保护的操作 —— " + AuthMethodKinds.Label(m.Kind);
+                                  : "保护的操作 —— " + (isMaster ? "主密码" : AuthMethodKinds.Label(m!.Kind));
+
+        var allowed = AuthService.MasterOperations(_s);
         _loading = true;
         foreach (var cb in _opsChecks)
-            cb.IsChecked = m != null && m.Operations.Contains((string)cb.Tag);
+        {
+            string op = (string)cb.Tag;
+            bool ok = allowed.Contains(op);
+            cb.IsChecked = m != null && m.Operations.Contains(op);
+            cb.IsEnabled = m != null && master != null && (isMaster || ok);
+            cb.ToolTip = "";
+            if (master == null) cb.ToolTip = "请先添加主密码";
+            else if (!isMaster && !ok) cb.ToolTip = "请先在「主密码」中勾选该操作";
+        }
         _loading = false;
+
+        ScopeHint.Text = master == null
+            ? "尚未设置主密码，现有授权暂不可修改；请先「添加密码」，之后由主密码决定可保护的操作范围。"
+            : "主密码决定可保护的操作范围：其他认证方式只能勾选主密码已授权的操作；取消主密码的某项授权时，其他方式会同步取消。取消「修改安全设置」后，管理认证方式将不再需要验证。";
+        if (_repaired) ScopeHint.Text += " 已自动补齐主密码缺失的授权。";
+        ScopeHint.SetResourceReference(Control.ForegroundProperty, _repaired ? "AppAccent" : "AppFgDim");
+
         bool has = m != null;
-        foreach (var cb in _opsChecks) cb.IsEnabled = has;
         EditBtn.IsEnabled = has && m!.Kind == AuthMethodKind.Password;
         RemoveBtn.IsEnabled = has;
     }
@@ -77,10 +98,25 @@ public partial class AuthMethodsWindow : Window
     private void Op_Changed(object sender, RoutedEventArgs e)
     {
         if (_loading) return;
+        var master = AuthService.Master(_s);
+        if (master == null) return;
         var m = Selected();
         if (m == null) return;
-        m.Operations = _opsChecks.Where(c => c.IsChecked == true)
-                                 .Select(c => (string)c.Tag).ToList();
+        var chosen = _opsChecks.Where(c => c.IsChecked == true)
+                               .Select(c => (string)c.Tag).ToList();
+        if (ReferenceEquals(m, master))
+        {
+            m.Operations = AuthOperation.All.Where(chosen.Contains).ToList();
+            var scope = m.Operations.ToHashSet();
+            foreach (var other in _s.AuthMethods)
+                if (!ReferenceEquals(other, m))
+                    other.Operations = other.Operations.Where(scope.Contains).ToList();
+        }
+        else
+        {
+            var allowed = AuthService.MasterOperations(_s);
+            m.Operations = AuthOperation.All.Where(op => chosen.Contains(op) && allowed.Contains(op)).ToList();
+        }
         _s.Save();
         var idx = MethodList.SelectedIndex;
         RefreshList();
@@ -108,11 +144,12 @@ public partial class AuthMethodsWindow : Window
                 MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
+        var allowed = AuthService.MasterOperations(_s);
         _s.AuthMethods.Add(new AuthMethodEntry
         {
             Kind = AuthMethodKind.System,
             Name = "Windows Hello",
-            Operations = AuthOperation.All.ToList()
+            Operations = AuthOperation.All.Where(allowed.Contains).ToList()
         });
         _s.Save();
         RefreshList();
@@ -150,11 +187,12 @@ public partial class AuthMethodsWindow : Window
         }
         opts.DriveLabel = root;
 
+        var allowed = AuthService.MasterOperations(_s);
         _s.AuthMethods.Add(new AuthMethodEntry
         {
             Kind = AuthMethodKind.Usb,
             Name = "U 盘 " + root.TrimEnd('\\'),
-            Operations = AuthOperation.All.ToList()
+            Operations = AuthOperation.All.Where(allowed.Contains).ToList()
         });
         _s.AuthMethods[_s.AuthMethods.Count - 1].SetUsbOptions(opts);
         _s.Save();
@@ -242,6 +280,12 @@ public partial class AuthMethodsWindow : Window
     {
         var m = Selected();
         if (m == null) return;
+        if (ReferenceEquals(m, AuthService.Master(_s)) && _s.AuthMethods.Count > 1)
+        {
+            System.Windows.MessageBox.Show(this, "主密码是其他认证方式的授权基础，请先删除其他认证方式。",
+                "易通遥 安全认证", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
         var r = System.Windows.MessageBox.Show(this, "确定删除该认证方式吗？", "易通遥 安全认证",
             MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (r != MessageBoxResult.Yes) return;

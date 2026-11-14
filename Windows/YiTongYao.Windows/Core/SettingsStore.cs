@@ -114,6 +114,7 @@ internal sealed class SettingsStore
                 if (s != null)
                 {
                     s.MigrateLegacy();
+                    if (AuthService.NormalizeOperations(s)) s.Save();
                     return s;
                 }
             }

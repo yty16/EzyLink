@@ -66,11 +66,14 @@ public partial class SetPasswordWindow : Window
         if (_entry == null)
         {
             int count = _s.AuthMethods.Count(m => m.Kind == AuthMethodKind.Password);
+            var allowed = AuthService.MasterOperations(_s);
             var entry = new AuthMethodEntry
             {
                 Kind = AuthMethodKind.Password,
                 Name = count == 0 ? "主密码" : "密码 " + (count + 1),
-                Operations = AuthOperation.All.ToList()
+                Operations = count == 0
+                    ? AuthOperation.All.ToList()
+                    : AuthOperation.All.Where(allowed.Contains).ToList()
             };
             entry.SetPasswordOptions(newOpts);
             _s.AuthMethods.Add(entry);

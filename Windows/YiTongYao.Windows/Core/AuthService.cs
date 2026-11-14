@@ -141,12 +141,55 @@ internal static class AuthService
 
     public static bool HasAnyMethod(SettingsStore? s) => s != null && s.AuthMethods.Count > 0;
 
+    // 主密码：第一条密码类认证方式
+    public static AuthMethodEntry? Master(SettingsStore s)
+        => s.AuthMethods.FirstOrDefault(m => m.Kind == AuthMethodKind.Password && m.Name == "主密码")
+           ?? s.AuthMethods.FirstOrDefault(m => m.Kind == AuthMethodKind.Password);
+
+    // 主密码已授权的操作
+    public static HashSet<string> MasterOperations(SettingsStore s)
+        => Master(s) is { } m
+            ? m.Operations.Where(AuthOperation.All.Contains).ToHashSet()
+            : new HashSet<string>();
+
+    // 补齐主密码授权，清理无效操作；返回是否改动
+    public static bool NormalizeOperations(SettingsStore s)
+    {
+        bool changed = false;
+        var master = Master(s);
+        if (master == null) return false;
+
+        var union = MasterOperations(s);
+        foreach (var m in s.AuthMethods)
+            foreach (var op in m.Operations)
+                if (AuthOperation.All.Contains(op)) union.Add(op);
+        foreach (var op in AuthOperation.All)
+            if (union.Contains(op) && !master.Operations.Contains(op))
+            { master.Operations.Add(op); changed = true; }
+
+        foreach (var m in s.AuthMethods)
+        {
+            var clean = m.Operations.Where(AuthOperation.All.Contains).Distinct().ToList();
+            if (!clean.SequenceEqual(m.Operations)) { m.Operations = clean; changed = true; }
+        }
+        return changed;
+    }
+
     public static List<AuthMethodEntry> MethodsFor(SettingsStore s, string operation)
     {
-        // 查询保护该操作的认证方式。
+        // 无主密码时保留既有配置
+        var master = Master(s);
+        if (master == null)
+        {
+            var legacy = s.AuthMethods.Where(m => m.Operations.Contains(operation)).ToList();
+            if (legacy.Count == 0)
+                legacy = s.AuthMethods.Where(m => m.Operations.Count == 0).ToList();
+            return legacy;
+        }
+        // 主密码未授权的操作不受保护，且主密码始终可用于已授权的操作
+        if (!master.Operations.Contains(operation)) return new List<AuthMethodEntry>();
         var list = s.AuthMethods.Where(m => m.Operations.Contains(operation)).ToList();
-        if (list.Count == 0)
-            list = s.AuthMethods.Where(m => m.Operations.Count == 0).ToList();
+        if (!list.Contains(master)) list.Insert(0, master);
         return list;
     }
 

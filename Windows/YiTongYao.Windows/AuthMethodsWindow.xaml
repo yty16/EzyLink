@@ -58,6 +58,8 @@
             <StackPanel>
                 <TextBlock x:Name="OpsTitle" Text="保护的操作" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
                 <WrapPanel x:Name="OpsPanel" Orientation="Horizontal"/>
+                <TextBlock x:Name="ScopeHint" FontSize="11" Foreground="{DynamicResource AppFgDim}"
+                           TextWrapping="Wrap" Margin="0,6,0,0"/>
                 <CheckBox x:Name="TwoFactorBox" Content="启用双因子（需两种不同类别的认证方式）"
                           Foreground="{DynamicResource AppFg}" FontSize="12" Margin="0,8,0,0"
                           Checked="TwoFactor_Changed" Unchecked="TwoFactor_Changed"/>
