@@ -2,8 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <!-- 蓝牙 RFCOMM 服务端需要 WinRT API（Windows.Devices.Bluetooth.Rfcomm），
-         因此目标框架须带 Windows SDK 版本；19041 = Windows 10 2004，覆盖 Win10/11。 -->
+    <!-- 目标框架：带 Windows SDK 版本以支持 WinRT 蓝牙。 -->
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -13,8 +12,7 @@
     <RootNamespace>YiTongYao.Windows</RootNamespace>
     <ApplicationIcon>Assets\vty_icon.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <!-- 项目同时启用 WinForms（托盘 NotifyIcon），SDK 会提示改用 WinForms 的 ApplicationHighDpiMode；
-         但本程序是 WPF 入口、不调用 ApplicationConfiguration.Initialize()，DPI 模式只能由 manifest 声明，故抑制该提示。 -->
+    <!-- 抑制 WinForms DPI 提示（WFAC010）。 -->
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <AssemblyTitle>易通遥 远程控制</AssemblyTitle>
     <Product>易通遥</Product>
@@ -24,9 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- 同时启用 WPF 与 WinForms 时，SDK 会隐式全局导入 System.Windows.Forms，
-         导致 Button / CheckBox / ListBox 等控件名与 System.Windows.Controls 同名冲突。
-         这里移除该隐式导入，WinForms 类型由需要的源文件自行 using。 -->
+    <!-- 移除 System.Windows.Forms 隐式导入。 -->
     <Using Remove="System.Windows.Forms" />
   </ItemGroup>
 

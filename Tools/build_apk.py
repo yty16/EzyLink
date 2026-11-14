@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-# 易通遥 APK 构建脚本（免 Gradle / 免 Maven / 纯框架层）
-# 仅依赖 Android SDK（platform + build-tools）与 JDK，可在任意装有 Android SDK 的机器上出包。
-# 用法：python Tools/build_apk.py [watch|phone]   （缺省构建 watch + phone）
+# APK 构建脚本（免 Gradle / 免 Maven）；用法：python Tools/build_apk.py [watch|phone]
 import os
 import sys
 import subprocess
@@ -37,21 +35,21 @@ ZIPALIGN = os.path.join(BT, "zipalign.exe")
 APKSIGNER = os.path.join(BT, "apksigner.bat")
 JAVA_HOME = os.environ.get("JAVA_HOME", r"C:/Program Files/Microsoft/jdk-17.0.19.10-hotspot")
 KEYTOOL = os.path.join(JAVA_HOME, "bin", "keytool.exe")
-# 发布签名密钥（专用，替代调试密钥；便于商店更新签名一致、且非 debug 签名）
+# 发布签名密钥
 KEYSTORE = os.path.join(ROOT, "Tools", "release.keystore")
 KEY_ALIAS = "ezykey"
 _KEYPASS_FILE = os.path.join(ROOT, "Tools", ".release_key_pass")
 
 
 def read_keypass():
-    # 口令存于本地未提交文件，避免明文进入仓库
+    # 读取本地签名口令
     if not os.path.exists(_KEYPASS_FILE):
         raise SystemExit("缺少签名口令文件：%s（请重新生成 release.keystore）" % _KEYPASS_FILE)
     with open(_KEYPASS_FILE, "r", encoding="ascii") as f:
         return f.read().strip()
 
 
-# 三端版本号独立计数（a.b.c.d）：d=小改+1，b=更新+1
+# 三端版本号（a.b.c.d）
 VERSIONS = {
     "watch": ("1.6.0.2", 1060002),
     "phone": ("1.4.0.2", 1040002),
@@ -63,7 +61,7 @@ ENV["JAVA_HOME"] = JAVA_HOME
 
 def run(cmd, cwd=None):
     print(">>", " ".join(cmd))
-    # 直接继承标准流，避免中文路径导致的 UTF-8 解码异常
+    # 继承标准流
     r = subprocess.run(cmd, cwd=cwd, env=ENV)
     if r.returncode != 0:
         raise SystemExit("命令失败（%s）：%s" % (r.returncode, " ".join(cmd)))
@@ -77,7 +75,7 @@ def ensure_keystore():
 
 
 def sync_tree(source, target):
-    # 模块：增量同步源码/资源到 ASCII 临时目录
+    # 增量同步源码/资源到 ASCII 临时目录
     os.makedirs(target, exist_ok=True)
     wanted = set()
     for root, _, files in os.walk(source):
@@ -96,7 +94,7 @@ def sync_tree(source, target):
 
 
 def clean_outputs(out):
-    # 模块：仅清理会被覆盖的中间产物，避免整目录删除
+    # 清理会被覆盖的中间产物
     for name in ("res.zip", "unsigned.apk", "withdex.apk", "aligned.apk",
                  "classes.jar", "classes.dex", "watch-release.apk", "phone-release.apk"):
         p = os.path.join(out, name)
@@ -114,7 +112,7 @@ def build(mod):
     res = os.path.join(base, "res")
     man = os.path.join(base, "AndroidManifest.xml")
 
-    # aapt2 等原生工具对中文路径参数支持不佳，先复制到 ASCII 临时目录构建，再拷回产物
+    # 复制到 ASCII 临时目录构建
     stage = os.path.join("C:/yty_build", mod)
     os.makedirs(stage, exist_ok=True)
     stage_src = os.path.join(stage, "src")
@@ -149,7 +147,7 @@ def build(mod):
             for f in files:
                 if f.endswith(".java"):
                     java_files.append(os.path.join(root, f))
-    # 使用 @argfile + 相对路径，避免源码数量增长后再次触发命令行长度限制
+    # 使用 @argfile + 相对路径
     argfile = os.path.join(stage, "sources.txt")
     with open(argfile, "w", encoding="utf-8") as af:
         for p in java_files:
@@ -163,8 +161,7 @@ def build(mod):
     dexdir = os.path.join(out, "dex")
     os.makedirs(dexdir, exist_ok=True)
 
-    # Windows 命令行上限约 8191 字符，直接把上百个 .class 绝对路径铺开会失败。
-    # 先把本次编译产物打成 jar 再交给 d8；按源文件名筛掉历史遗留的 class。
+    # 按源文件名筛选本次产物，打成 jar 交给 d8
     stems = set()
     for p in java_files:
         stems.add(os.path.splitext(os.path.basename(p))[0])

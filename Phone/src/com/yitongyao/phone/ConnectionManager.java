@@ -18,7 +18,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-/** 自动连接管理：WiFi / 蓝牙双通道，全 App 共用一条长连接 */
+/** 自动连接管理。 */
 public final class ConnectionManager {
 
     public static final int STATE_OFF = 0;
@@ -120,7 +120,7 @@ public final class ConnectionManager {
         return sendInternal(cmd);
     }
 
-    // ---------- 工作线程 ----------
+    // 工作线程
 
     private void loop() {
         while (running) {
@@ -218,7 +218,7 @@ public final class ConnectionManager {
         return m;
     }
 
-    /** UDP 广播发现；同时带回电脑端蓝牙 MAC */
+    /** UDP 广播发现。 */
     public List<String> discover() {
         List<String> out = new ArrayList<String>();
         DatagramSocket ds = null;

@@ -17,16 +17,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-/**
- * 手机端主控制界面（竖屏大屏）。
- * 通过 WiFi / 电脑移动热点直连电脑，控制 PPT 放映与锁屏/睡眠/关机/重启/开机(WoL)。
- *
- * 打开即自动连接：由 ConnectionManager 在后台完成「直连已保存地址 → 广播发现 → 自动重试」，
- * 连上后保持长连接，点按钮即时生效；未连接时会明确提示并立即重试，不再静默失败。
- *
- * 内置「崩溃自报」：任何未捕获异常都会以安全主题在屏幕上打印堆栈，
- * 便于在无电脑/无 adb 时直接看到真正报错。
- */
+/** 主控制界面。 */
 public class MainActivity extends Activity {
 
     /** 扫码请求码。 */
@@ -38,7 +29,7 @@ public class MainActivity extends Activity {
     /** 设备列表页请求码。 */
     private static final int REQ_DEVICES = 9104;
     private static final String BT_PERM = "android.permission.BLUETOOTH_CONNECT";
-    /** 电脑端二维码固定前缀：YTY1|IP|端口|配对码[|蓝牙MAC]。 */
+    /** 二维码固定前缀。 */
     private static final String QR_PREFIX = "YTY1|";
 
     private SharedPreferences prefs;
@@ -49,7 +40,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // 全局兜底：任何主线程未捕获异常都显示到屏幕上
+        // 显示未捕获异常
         Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
             @Override
             public void uncaughtException(Thread t, Throwable e) {
@@ -58,7 +49,7 @@ public class MainActivity extends Activity {
         });
         try {
             super.onCreate(savedInstanceState);
-            // 首次使用须同意《用户协议》与《免责声明》，未同意则进入协议网关
+            // 未同意协议则进入协议页
             prefs = getSharedPreferences("yity", Context.MODE_PRIVATE);
             if (!prefs.getBoolean("eula_agreed", false)) {
                 startActivity(new Intent(MainActivity.this, AgreementActivity.class));
@@ -76,7 +67,7 @@ public class MainActivity extends Activity {
 
         prefs = getSharedPreferences("yity", Context.MODE_PRIVATE);
         deviceStore = new DeviceStore(prefs);
-        deviceStore.current();   // 首次启动把旧版单一连接迁移为「我的电脑」
+        deviceStore.current();   // 迁移旧连接设置
         status = findViewById(R.id.status);
         connState = findViewById(R.id.connState);
 
@@ -134,7 +125,7 @@ public class MainActivity extends Activity {
             }
         });
         conn.start();
-        // 共用连接可能已经连好（例如从沉浸页返回），按真实状态回填
+        // 按真实状态回填
         if (conn.isConnected()) {
             applyConnState(ConnectionManager.STATE_ON, "已连接 " + conn.getTarget());
         } else {
@@ -150,7 +141,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** 启动扫码页；先确保已获得相机权限。 */
+    /** 启动扫码页。 */
     private void startScan() {
         if (Build.VERSION.SDK_INT >= 23
                 && checkSelfPermission(android.Manifest.permission.CAMERA)
@@ -187,10 +178,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    /**
-     * 解析电脑端二维码：把扫码得到的电脑作为一台设备写入仓库（同 IP+端口则合并），
-     * 并立即切换为当前设备触发重连。支持标准格式 YTY1|IP|端口|配对码[|蓝牙MAC] 及容错写法。
-     */
+    /** 解析二维码并切换设备。 */
     private boolean applyQrPayload(String text) {
         Device d = Device.fromQr(text);
         if (d == null) return false;
@@ -205,11 +193,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        // 从设置页 / 设备列表返回后立刻重试（可能刚切换了设备 / 改了 IP / 配对码）
+        // 返回后立即重连
         if (conn != null) conn.wakeUp();
     }
 
-    /** 表冠（旋转侧键 / 表圈）旋转 → 主页面纵向滚动。 */
+    /** 表冠滚动页面。 */
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         if (Rotary.scroll(this, event, R.id.scroll, 100f)) return true;
@@ -226,11 +214,11 @@ public class MainActivity extends Activity {
         if (connState == null) return;
         connState.setText(detail);
         if (state == ConnectionManager.STATE_ON) {
-            connState.setTextColor(Color.parseColor("#0a8a8f"));   // 已连接：青绿
+            connState.setTextColor(getResources().getColor(R.color.status_connected));   // 已连接：强调色
         } else if (state == ConnectionManager.STATE_CONNECTING) {
-            connState.setTextColor(Color.parseColor("#B26A00"));   // 连接中：橙
+            connState.setTextColor(getResources().getColor(R.color.status_connecting));   // 连接中：橙
         } else {
-            connState.setTextColor(Color.parseColor("#777777"));   // 未连接：灰
+            connState.setTextColor(getResources().getColor(R.color.status_disconnected));   // 未连接：灰
         }
     }
 
@@ -256,7 +244,7 @@ public class MainActivity extends Activity {
     }
 
     private void send(final String cmd) {
-        // 网络开机不需要先连接电脑：直接发 WoL 魔术包
+        // 网络开机无须先连接
         if ("wol".equals(cmd)) {
             sendWol();
             return;
@@ -304,7 +292,7 @@ public class MainActivity extends Activity {
         });
     }
 
-    /** 以安全主题用代码构建错误界面，避免再次加载可能出问题的 XML/style。 */
+    /** 显示错误界面。 */
     private void showError(Throwable e) {
         try {
             setTheme(android.R.style.Theme_Material_Light_NoActionBar);
@@ -326,7 +314,7 @@ public class MainActivity extends Activity {
             } catch (Throwable ignored) {
             }
         } catch (Throwable ignored) {
-            // 连错误界面都无法构建时静默退出，避免死循环
+            // 无法构建时静默退出
         }
     }
 

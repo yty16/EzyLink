@@ -11,6 +11,8 @@ phone/*.apk
 *.dex
 *.class
 *.cipx
+__pycache__/
+*.pyc
 
 # 签名密钥与口令（私钥，绝不推送到公开仓库）
 Tools/release.keystore

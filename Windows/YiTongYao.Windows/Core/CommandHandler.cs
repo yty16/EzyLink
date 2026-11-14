@@ -2,10 +2,7 @@ using System.Text.Json;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 指令分发：把一条 JSON 指令转换为具体动作并返回 JSON 响应。
-/// 鉴权（auth 握手、高危指令门禁）由 RemoteServer 负责，这里只执行已放行的指令。
-/// </summary>
+/// <summary>指令分发：把 JSON 指令转换为动作并返回响应。</summary>
 internal static class CommandHandler
 {
     public static string Handle(string line, Action<string>? log = null)

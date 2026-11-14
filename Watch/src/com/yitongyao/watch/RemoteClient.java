@@ -11,10 +11,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 
-/**
- * 易通遥 远端控制客户端（纯 Android 框架层实现，无第三方依赖）。
- * 与 Windows 端共用文本 JSON、按行分隔的指令协议（详见项目根 Protocol.md）。
- */
+/** 易通遥远端控制客户端。*/
 public final class RemoteClient {
 
     private RemoteClient() {

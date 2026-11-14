@@ -1,8 +1,6 @@
 ﻿namespace YiTongYao.Core;
 
-/// <summary>
-/// 易通遥 全局常量。ProductCode 为内部构建标识（Base64），不影响功能。
-/// </summary>
+/// <summary>易通遥全局常量。</summary>
 internal static class AppConstants
 {
     public const string AppName = "易通遥";

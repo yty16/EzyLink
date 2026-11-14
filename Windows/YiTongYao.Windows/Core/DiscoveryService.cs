@@ -9,17 +9,7 @@ using System.Threading.Tasks;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// UDP 广播自动发现服务。
-///
-/// 解决的问题：手机 / 手表要连电脑，必须知道电脑 IP；而家庭/公司/热点环境下 IP 会变，
-/// 手填 IP 很容易失效（表现为「点了按钮没反应」）。
-///
-/// 机制：手机端向 255.255.255.255:<see cref="AppConstants.DiscoveryPort"/> 广播
-/// <see cref="AppConstants.DiscoveryRequest"/>，本服务收到后回复本机的主机名、TCP 端口
-/// 与候选 IP 列表；与请求方同网段的地址排在最前，客户端依次尝试即可连通。
-/// 该过程完全在局域网内完成，不需要互联网。
-/// </summary>
+/// <summary>UDP 广播自动发现服务。</summary>
 internal sealed class DiscoveryService : IDisposable
 {
     private UdpClient? _udp;

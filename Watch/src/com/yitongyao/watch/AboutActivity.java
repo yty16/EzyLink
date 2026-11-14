@@ -8,17 +8,14 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-/**
- * 关于本应用（手表端）：展示应用名称、版本、简介，以及开源仓库、开发者、隐私政策与许可证。
- * 仓库 / 开发者 / 隐私政策均可点击跳转；长内容支持表冠旋转滚动。
- */
+/** 关于页面。*/
 public class AboutActivity extends Activity {
 
-    /** 开源仓库（含完整协议与隐私政策）。 */
+    /** 开源仓库。*/
     private static final String REPO_URL = "https://github.com/yty16/EzyLink";
     /** 开发者主页。 */
     private static final String DEV_URL = "https://github.com/yty16";
-    /** 隐私政策（随仓库发布的 PRIVACY.md）。 */
+    /** 隐私政策。*/
     private static final String PRIVACY_URL = "https://github.com/yty16/EzyLink/blob/main/PRIVACY.md";
 
     @Override
@@ -54,7 +51,6 @@ public class AboutActivity extends Activity {
         try {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
         } catch (Exception ignored) {
-            // 无可用浏览器时静默忽略
         }
     }
 

@@ -8,13 +8,7 @@ using System.Net.NetworkInformation;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 离线直连辅助：Windows 移动热点状态检测 + 防火墙放行。
-///
-/// 「电脑不联网也能被控制」的关键场景：电脑开启移动热点（笔记本自带无线网卡即可），
-/// 手机 / 手表连上这个热点后与电脑处于同一网段，无需路由器、无需互联网。
-/// 此时电脑在热点中的地址通常是 192.168.137.1（Windows 承载网络默认地址）。
-/// </summary>
+/// <summary>离线直连辅助：移动热点检测与防火墙放行。</summary>
 internal static class HotspotHelper
 {
     /// <summary>移动热点是否已开启（存在已启用且带 IPv4 的承载网络 / Wi-Fi Direct 适配器）。</summary>
@@ -51,10 +45,7 @@ internal static class HotspotHelper
         return null;
     }
 
-    /// <summary>
-    /// 列出本机所有可连接的 IPv4（非回环、非 APIPA），热点地址排在最前。
-    /// 用于界面展示「设备应该连哪个地址」，也用于自动发现响应。
-    /// </summary>
+    /// <summary>列出可连接的 IPv4 地址。</summary>
     public static List<string> ListCandidateIps()
     {
         var result = new List<string>();
@@ -76,10 +67,7 @@ internal static class HotspotHelper
         return result;
     }
 
-    /// <summary>
-    /// 在与 remote 同网段的候选地址中挑一个最合适的（自动发现响应用），
-    /// 找不到同网段的则返回热点地址或第一个候选。
-    /// </summary>
+    /// <summary>挑选与对端同网段的最佳地址。</summary>
     public static string? GetBestIpFor(IPAddress remote)
     {
         try
@@ -119,11 +107,7 @@ internal static class HotspotHelper
         }
     }
 
-    /// <summary>
-    /// 为本程序添加防火墙入站放行规则（需管理员，会弹 UAC）。
-    /// 这是「手机点了没反应」最常见的根因：Windows 防火墙默认拦截未授权程序的入站连接，
-    /// 电脑端明明在监听，手机却连不上。
-    /// </summary>
+    /// <summary>添加防火墙入站放行规则。</summary>
     public static bool TryOpenFirewall(out string message)
     {
         var exe = AutoStart.ExePath;
@@ -159,11 +143,7 @@ internal static class HotspotHelper
 
     public const string FirewallRuleName = "易通遥 远程控制";
 
-    /// <summary>
-    /// 检查防火墙入站放行规则是否已存在（netsh 查询不需要管理员权限）。
-    /// 未放行时手机 / 手表连不上本机，这是「点按钮没反应」的常见根因，
-    /// 程序启动时会据此提示用户补做放行。
-    /// </summary>
+    /// <summary>检查防火墙放行规则是否存在。</summary>
     public static bool IsFirewallRulePresent()
     {
         try
@@ -180,9 +160,7 @@ internal static class HotspotHelper
             var output = p.StandardOutput.ReadToEnd();
             p.WaitForExit(8000);
 
-            // 不能用「输出包含规则名」判断：netsh 输出是系统 ANSI（中文 GBK），
-            // 按默认编码读取会乱码从而误判为「未放行」。改为按输出规模判断：
-            // 规则不存在时 netsh 只回一行「找不到匹配的规则」，存在时回完整规则详情。
+            // 按输出规模判断规则是否存在。
             return p.ExitCode == 0 && output.Trim().Length > 50;
         }
         catch

@@ -6,10 +6,7 @@ using System.Windows.Documents;
 
 namespace YiTongYao.Windows;
 
-/// <summary>
-/// 关于本应用：展示应用名称、版本、简介、开源仓库、开发者、隐私政策与许可证。
-/// 仓库 / 开发者 / 协议链接在默认浏览器中打开；本地 PRIVACY.md 优先。
-/// </summary>
+/// <summary>关于本应用窗口。</summary>
 public partial class AboutWindow : Window
 {
     private const string RepoUrl = "https://github.com/yty16/EzyLink";

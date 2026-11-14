@@ -6,9 +6,7 @@ using System.Text.Json;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 更新信息（对标 PeekShield UpdateService：GitHub Releases latest 接口）。
-/// </summary>
+/// <summary>更新信息。</summary>
 public class UpdateInfo
 {
     public string? Version { get; set; }
@@ -30,10 +28,7 @@ public class UpdateAsset
     public string SizeText => Size <= 0 ? "" : (Size / 1024.0 / 1024.0).ToString("0.0") + " MB";
 }
 
-/// <summary>
-/// 自动更新服务：检查 GitHub Releases 最新版本 → 版本比较 → 下载 win-x64 安装包 → 启动安装器并退出本程序。
-/// 全程可失败降级：网络异常时提示用户到发布页手动下载，不影响主功能使用。
-/// </summary>
+/// <summary>自动更新服务。</summary>
 internal static class UpdateService
 {
     private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(25) };
@@ -98,9 +93,7 @@ internal static class UpdateService
         return info;
     }
 
-    /// <summary>
-    /// 下载并启动安装包；返回是否成功启动安装器。
-    /// </summary>
+    /// <summary>下载并启动安装包。</summary>
     public static async Task<bool> PerformUpdateAsync(UpdateInfo info, Action<string>? progress = null)
     {
         try
@@ -130,9 +123,7 @@ internal static class UpdateService
         }
     }
 
-    /// <summary>
-    /// 选取本机平台的安装包：Windows 取 win-x64 + .exe。
-    /// </summary>
+    /// <summary>选取本机平台的安装包。</summary>
     private static UpdateAsset? PickAsset(List<UpdateAsset> assets)
     {
         return assets.FirstOrDefault(a =>
@@ -168,9 +159,7 @@ internal static class UpdateService
         return s.Contains('.') ? s : null;
     }
 
-    /// <summary>
-    /// a.b.c.d 四段版本比较（.NET Version 支持 4 段）。
-    /// </summary>
+    /// <summary>四段版本比较。</summary>
     private static bool IsNewer(string? remote)
     {
         if (string.IsNullOrWhiteSpace(remote)) return false;

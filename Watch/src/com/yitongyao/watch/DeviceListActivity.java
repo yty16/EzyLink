@@ -19,10 +19,7 @@ import android.widget.Toast;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * 设备列表：记录多台电脑、点击切换、长按删除、扫码 / 手动添加。
- * 与主页共用同一条 {@link ConnectionManager} 长连接；切换后主页 onResume 会立即重连。
- */
+/** 设备列表页面。*/
 public class DeviceListActivity extends Activity {
 
     private static final int REQ_ADD_SCAN = 9201;
@@ -58,7 +55,7 @@ public class DeviceListActivity extends Activity {
                 }
             });
 
-            // 确保旧版单一连接已被迁移进列表
+            // 迁移旧连接。
             store.current();
             buildList();
         } catch (Throwable e) {
@@ -83,11 +80,11 @@ public class DeviceListActivity extends Activity {
             row.setGravity(android.view.Gravity.START | android.view.Gravity.CENTER_VERTICAL);
             row.setPadding(12, 6, 12, 6);
             if (d.id.equals(curId)) {
-                row.setBackgroundColor(Color.parseColor("#15323a"));
-                row.setTextColor(Color.parseColor("#36E2E8"));
+                row.setBackgroundColor(getResources().getColor(R.color.control_bg));
+                row.setTextColor(getResources().getColor(R.color.accent));
             } else {
-                row.setBackgroundColor(Color.parseColor("#241d3a"));
-                row.setTextColor(Color.parseColor("#ECEAFF"));
+                row.setBackgroundColor(getResources().getColor(R.color.surface));
+                row.setTextColor(getResources().getColor(R.color.fg));
             }
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -138,7 +135,7 @@ public class DeviceListActivity extends Activity {
         d.port = "7788";
         store.upsert(d);
         store.activate(d.id);
-        // 打开设置页填写这台新设备的细节，填完保存即回到本列表
+        // 打开设置页填写设备。
         startActivity(new Intent(this, SettingsActivity.class));
         finish();
     }

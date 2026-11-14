@@ -6,9 +6,7 @@ using System.Text.Json;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 简单的本地设置持久化（JSON 文件）。
-/// </summary>
+/// <summary>本地设置持久化（JSON 文件）。</summary>
 internal sealed class SettingsStore
 {
     private static readonly string FilePath =
@@ -34,6 +32,13 @@ internal sealed class SettingsStore
     public bool HideTrayIcon { get; set; } = false;
 
     public bool AutoCheckUpdate { get; set; } = true;
+
+    // ---------- 外观主题 ----------
+    /// <summary>主题模式：system / light / dark（对应 ThemeManager.ThemeMode）。</summary>
+    public string ThemeMode { get; set; } = "system";
+
+    /// <summary>自定义强调色（十六进制，如 #36E2E8）。为空时跟随明暗默认强调色。</summary>
+    public string AccentHex { get; set; } = "";
 
     /// <summary>是否启用蓝牙 RFCOMM 通道（独立于 WiFi 通道）。</summary>
     public bool BluetoothEnabled { get; set; } = false;

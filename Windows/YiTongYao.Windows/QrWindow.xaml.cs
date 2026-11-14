@@ -6,18 +6,11 @@ using YiTongYao.Core;
 
 namespace YiTongYao.Windows
 {
-    /// <summary>
-    /// 扫码连接窗口：显示本机的连接二维码（内容：YTY1|IP|端口|配对码[|蓝牙MAC]），
-    /// 手机 / 手表端扫描后自动填入并连接。
-    /// </summary>
+    /// <summary>扫码连接窗口。</summary>
     public partial class QrWindow : Window
     {
         private readonly string _payload;
 
-        /// <param name="ip">推荐给设备连接的 IPv4（热点地址优先）。</param>
-        /// <param name="port">TCP 监听端口。</param>
-        /// <param name="pairCode">配对码。</param>
-        /// <param name="btMac">本机蓝牙 MAC；为空表示二维码不带蓝牙信息。</param>
         public QrWindow(string ip, int port, string pairCode, string btMac = "")
         {
             InitializeComponent();

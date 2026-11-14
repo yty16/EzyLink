@@ -4,17 +4,7 @@ using Microsoft.Win32;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 开机自动启动管理。
-///
-/// 采用「当前用户」注册表 Run 键（HKCU\...\Run），而不是开始菜单启动文件夹或 HKLM：
-/// - 用户级写入不需要管理员权限，与本程序「RequestExecutionLevel user」的安装策略一致；
-/// - 便携版 / 安装版都能正常工作；
-/// - 卸载时可编程清除，避免卸载后开机仍尝试启动一个已不存在的程序。
-///
-/// 启动参数带 --startup：用于区分「用户手动打开」与「随系统开机启动」，
-/// 后者可按设置静默进入后台（不弹主窗口）。
-/// </summary>
+/// <summary>开机自动启动管理。</summary>
 internal static class AutoStart
 {
     private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
@@ -78,12 +68,7 @@ internal static class AutoStart
         }
     }
 
-    /// <summary>
-    /// 按设置同步启动项：
-    /// - 设置开启但注册表缺失（被安全软件清理、重装到新目录、换了便携版位置）时自动补回；
-    /// - 路径与当前 exe 不一致时更新，避免开机启动一个旧位置的程序。
-    /// 设置关闭时不改动注册表（用户可能用系统任务管理器自行管理启动项，不做强制清除）。
-    /// </summary>
+    /// <summary>按设置同步启动项。</summary>
     public static bool Sync(bool desired)
     {
         if (!desired) return false;

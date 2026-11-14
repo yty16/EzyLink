@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌调色板（深色）。-->
+    <color name="bg">#1b1136</color>
+    <color name="surface">#251846</color>
+    <color name="surface_alt">#2a2350</color>
+    <color name="control_bg">#3a2a6e</color>
+    <color name="border">#3a2a6e</color>
+    <color name="fg">#ECEAFF</color>
+    <color name="fg_muted">#9C93C9</color>
+    <color name="fg_dim">#7d73a8</color>
+    <color name="accent">#36E2E8</color>
+    <color name="accent2">#965CE9</color>
+    <color name="accent_fg">#11102A</color>
+    <color name="danger">#FF6B6B</color>
+    <color name="danger_bg">#6e2a3a</color>
+    <color name="log_bg">#160d2e</color>
+    <color name="log_fg">#bdb4e8</color>
+    <color name="status_connected">#36E2E8</color>
+    <color name="status_connecting">#FFB74D</color>
+    <color name="status_disconnected">#9E9E9E</color>
+</resources>

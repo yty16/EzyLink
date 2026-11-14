@@ -4,16 +4,12 @@ using System.Net.Sockets;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 获取本机网络信息：IPv4 地址、MAC、主机名。
-/// </summary>
+/// <summary>获取本机网络信息。</summary>
 internal static class NetworkInfo
 {
     public static string HostName => Dns.GetHostName();
 
-    /// <summary>
-    /// 选择一个合适的本机 IPv4 地址（非回环、非 APIPA、非虚拟网卡优先）。
-    /// </summary>
+    /// <summary>选择合适的本机 IPv4 地址。</summary>
     public static string? GetLocalIp()
     {
         foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
@@ -40,9 +36,7 @@ internal static class NetworkInfo
         return null;
     }
 
-    /// <summary>
-    /// 返回与上述 IPv4 对应的 MAC 地址（AA-BB-CC-DD-EE-FF 格式）。
-    /// </summary>
+    /// <summary>返回对应的 MAC 地址。</summary>
     public static string? GetMac()
     {
         foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())

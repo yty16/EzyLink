@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-# 易通遥 / EzyLink 应用图标生成器（手机 squircle + 手表 squircle/round + 商店素材）
-# 依赖 Pillow 与系统 CJK 字体（SimHei / Microsoft YaHei）。
+# 应用图标生成器（依赖 Pillow 与系统 CJK 字体）。
 import os
 import math
 from PIL import Image, ImageDraw, ImageFont
@@ -48,7 +47,7 @@ def glyph_centered(size, text, color, ratio=0.56, dy=0.0):
 
 
 def accent_bar(size):
-    """底部品牌青短横，象征「连接」。"""
+    """底部品牌青短横。"""
     layer = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(layer)
     bw = int(size * 0.40)

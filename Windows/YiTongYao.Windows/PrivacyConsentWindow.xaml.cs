@@ -5,11 +5,7 @@ using System.Windows;
 
 namespace YiTongYao.Windows;
 
-/// <summary>
-/// 隐私告知与同意窗口（仿窥屿盾流程）。
-/// required=true 为首次启动的强制征求：不同意则退出程序；
-/// required=false 为设置里主动打开：可重新查看并再次同意。
-/// </summary>
+/// <summary>隐私告知与同意窗口。</summary>
 public partial class PrivacyConsentWindow : Window
 {
     public bool Accepted { get; private set; }

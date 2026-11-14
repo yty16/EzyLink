@@ -4,11 +4,7 @@ using System.Text;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 二维码（QR Code）编码器 —— 标准兼容的精简实现，无第三方依赖，保证离线可构建。
-/// 支持：字节模式（0100）、纠错等级 L / M、版本 1 ~ 10（按内容长度自动选择最小可用版本）。
-/// 输出为模块矩阵（true = 深色），渲染时另加 4 模块静默区。
-/// </summary>
+/// <summary>二维码（QR Code）编码器。</summary>
 internal static class QrEncoder
 {
     /// <summary>扫码载荷前缀，移动端据此识别是否为易通遥的连接二维码。</summary>
@@ -263,10 +259,7 @@ internal static class QrEncoder
         return high;
     }
 
-    /// <summary>
-    /// 多项式长除法取模：计算 (data(x) * x^degree) mod gen(x)。
-    /// data 与 gen 均为「高次在前」排列，返回余式系数（高次在前，长度 degree）。
-    /// </summary>
+    /// <summary>多项式长除法取模。</summary>
     private static byte[] RsRemainder(byte[] data, int dataLen, byte[] gen, int degree)
     {
         var buf = new byte[dataLen + degree];

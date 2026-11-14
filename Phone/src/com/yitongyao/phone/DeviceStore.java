@@ -6,11 +6,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 多设备仓库：在 {@link SharedPreferences} 中以 JSON 数组保存所有「被控电脑」，
- * 并记录当前选中设备。切换设备时把选中记录写入连接设置区旧键，
- * 使 {@link ConnectionManager} 沿用既有读取逻辑即可用新设置重连。
- */
+/** 多设备仓库。 */
 public final class DeviceStore {
 
     private static final String KEY_DEVICES = "yty_devices";
@@ -35,7 +31,7 @@ public final class DeviceStore {
         return out;
     }
 
-    /** 当前设备；首次使用时把旧的单一连接设置迁移成一台设备。 */
+    /** 取当前设备。 */
     public Device current() {
         List<Device> all = list();
         if (all.isEmpty()) {
@@ -64,7 +60,7 @@ public final class DeviceStore {
         return null;
     }
 
-    /** 切换当前设备：写入连接设置区旧键并刷新列表中的时间戳。 */
+    /** 切换当前设备。 */
     public void activate(String id) {
         Device d = find(id);
         if (d == null) return;
@@ -92,7 +88,7 @@ public final class DeviceStore {
         if (changed) save(all);
     }
 
-    /** 新增或更新一台设备（按 id 去重）。 */
+    /** 新增或更新设备。 */
     public Device upsert(Device d) {
         List<Device> all = list();
         boolean found = false;
@@ -108,10 +104,7 @@ public final class DeviceStore {
         return d;
     }
 
-    /**
-     * 由扫码得到的设备写入仓库：若已存在同 IP + 同端口的设备则合并（保留旧 id / 名称），
-     * 否则作为新设备添加。返回最终落库的设备。
-     */
+    /** 写入扫码得到的设备。 */
     public Device upsertFromQr(Device scanned) {
         List<Device> all = list();
         Device match = null;
@@ -134,7 +127,7 @@ public final class DeviceStore {
         return scanned;
     }
 
-    /** 删除设备；若删的是当前设备，自动切到列表中的另一台（无则清空当前标记）。 */
+    /** 删除设备。 */
     public void remove(String id) {
         List<Device> all = list();
         List<Device> out = new ArrayList<>();
@@ -149,7 +142,7 @@ public final class DeviceStore {
         }
     }
 
-    /** 把当前连接设置区（SharedPreferences 旧键）写回当前设备对象，便于编辑后持久化。 */
+    /** 写回当前设备对象。 */
     public void syncCurrentFromPrefs() {
         Device cur = current();
         if (cur == null) {

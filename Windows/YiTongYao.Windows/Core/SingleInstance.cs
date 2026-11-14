@@ -6,11 +6,7 @@ using System.Threading.Tasks;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 单实例互斥 + 进程间简单命令（SHOW / RESTART）。
-/// 主实例持有命名互斥体并启动命名管道监听；重复启动时次实例通过管道通知主实例，
-/// 并弹出「已在运行」提示，可选「重启当前实例」。
-/// </summary>
+/// <summary>单实例互斥 + 进程间命令（SHOW / RESTART）。</summary>
 internal static class SingleInstance
 {
     private const string MutexName = "EzyLink_SingleInstance_yty16";
@@ -19,9 +15,7 @@ internal static class SingleInstance
     private static Mutex? _mutex;
     private static CancellationTokenSource? _cts;
 
-    /// <summary>
-    /// 尝试成为主实例。true = 本实例为主（已持有互斥体）；false = 已有主实例在运行。
-    /// </summary>
+    /// <summary>尝试成为主实例；true = 本实例为主。</summary>
     public static bool TryBecomePrimary()
     {
         bool createdNew;
@@ -46,10 +40,7 @@ internal static class SingleInstance
         return false;
     }
 
-    /// <summary>
-    /// 主实例启动 IPC 监听。收到 SHOW 时调用 onShow，收到 RESTART 时调用 onRestart。
-    /// 两个回调会在后台线程触发，调用方须自行切回 UI 线程。
-    /// </summary>
+    /// <summary>主实例启动 IPC 监听（回调在后台线程）。</summary>
     public static void StartServer(Action onShow, Action onRestart)
     {
         _cts?.Cancel();
@@ -82,7 +73,7 @@ internal static class SingleInstance
         }, token);
     }
 
-    /// <summary>向已有主实例发送命令（SHOW / RESTART）。返回是否成功连上并写入。</summary>
+    /// <summary>向主实例发送命令，返回是否成功。</summary>
     public static bool Signal(string command, int timeoutMs = 2000)
     {
         try

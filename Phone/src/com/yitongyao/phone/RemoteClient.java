@@ -11,10 +11,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 
-/**
- * 易通遥 远端控制客户端（纯 Android 框架层实现，无第三方依赖）。
- * 与 Windows 端共用文本 JSON、按行分隔的指令协议（详见项目根 Protocol.md）。
- */
+/** 远端控制客户端。 */
 public final class RemoteClient {
 
     private RemoteClient() {
@@ -30,7 +27,7 @@ public final class RemoteClient {
         }
     }
 
-    /** 发送单条指令并读取一行 JSON 响应。 */
+    /** 发送指令并读取响应。 */
     public static Result send(String ip, int port, String token, String cmd) {
         try (Socket socket = new Socket(ip, port)) {
             socket.setSoTimeout(5000);
@@ -56,7 +53,7 @@ public final class RemoteClient {
         }
     }
 
-    /** 发送 Wake-on-LAN 魔术包以唤醒关机状态的电脑。 */
+    /** 发送 WoL 魔术包唤醒电脑。 */
     public static void wakeOnLan(String mac) throws Exception {
         String clean = mac.replace(":", "").replace("-", "").replace(" ", "").trim();
         if (clean.length() != 12) {

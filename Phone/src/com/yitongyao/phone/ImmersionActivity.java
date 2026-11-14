@@ -13,38 +13,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-/**
- * 沉浸模式（手机端）。
- *
- * 场景：放映 PPT 时环境通常很暗，控制端屏幕亮起会干扰观众、也暴露操作过程。
- * 沉浸模式把整屏变为纯黑，仅通过「盲操作」控制放映：
- *
- * <pre>
- *   上半屏  短按 → 上一页        长按 → 进入 / 退出放映
- *   下半屏  短按 → 下一页        长按 → 关闭沉浸模式
- *
- *   音量上键 ≡ 上半屏短按（上一页）
- *   音量下键 ≡ 下半屏短按（下一页）
- *   按住音量键不放 ≡ 对应区域的长按
- * </pre>
- *
- * 实现要点：
- * 1. 全程 <c>FLAG_KEEP_SCREEN_ON</c>，防止系统自动息屏打断控制（无需额外权限）；
- * 2. 长按判定 600ms，手指移动超过阈值即取消，避免误触发；
- * 3. 每次有效操作都给一次震动反馈，保证黑屏下也能确认指令已发出；
- * 4. 返回键被拦截，避免放映中误触退出（只有长按下半屏才关闭沉浸模式）；
- * 5. 指令仍走 <see cref="ConnectionManager"/> 的长连接，
- *    因此「上一页 / 下一页 / 放映」与常规按钮走的是同一套协议与鉴权。
- */
+/** 沉浸模式放映控制页。 */
 public class ImmersionActivity extends Activity {
 
     /** 长按判定阈值。 */
     private static final long LONG_PRESS_MS = 600;
 
-    /** 手指移动容差（像素），超出则取消本次操作。 */
+    /** 手指移动容差。 */
     private static final float MOVE_TOLERANCE = 24f;
 
-    /** 提示文字停留时间；到点自动隐藏，保持全黑。 */
+    /** 提示停留时间。 */
     private static final long HINT_MS = 2200;
 
     /** 内部构建令牌（初始化时校验，勿改动）。 */
@@ -57,7 +35,7 @@ public class ImmersionActivity extends Activity {
     private boolean longPressFired;
     private Runnable pendingLongPress;
 
-    /** 记录本端认为的放映状态，用于上部长按在「进入 / 退出」间切换。 */
+    /** 记录放映状态。 */
     private boolean slideshowOn;
 
     @Override
@@ -70,7 +48,7 @@ public class ImmersionActivity extends Activity {
         });
         try {
             super.onCreate(savedInstanceState);
-            // 沉浸模式下保持常亮：不加这个标志，设备会在设定的息屏时间后自动关闭屏幕
+            // 保持屏幕常亮
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             setContentView(R.layout.activity_immersion);
             initUi();
@@ -87,7 +65,7 @@ public class ImmersionActivity extends Activity {
         showHint(getString(R.string.immersion_enter));
     }
 
-    /** 沉浸页自带一条长连接，与主页互不影响；返回主页后连接随页面释放。 */
+    /** 建立本页长连接。 */
     private void startConnection() {
         conn = ConnectionManager.shared(this);
         conn.setListener(new ConnectionManager.Listener() {
@@ -99,11 +77,7 @@ public class ImmersionActivity extends Activity {
         conn.wakeUp();
     }
 
-    /**
-     * 绑定一个触摸区。
-     *
-     * @param isTop true=上半屏（上一页 / 长按放映），false=下半屏（下一页 / 长按退出沉浸）
-     */
+    /** 绑定触摸区。 */
     private void bindZone(View v, final boolean isTop) {
         v.setOnTouchListener(new View.OnTouchListener() {
             private boolean fired;
@@ -159,23 +133,23 @@ public class ImmersionActivity extends Activity {
         });
     }
 
-    /** 短按上半屏 → 上一页；短按下半屏 → 下一页。 */
+    /** 短按翻页。 */
     private void onTapZone(boolean isTop) {
         buzz(18);
         send(isTop ? "ppt_prev" : "ppt_next");
     }
 
-    /** 长按时已震动提示，这里只负责执行动作。 */
+    /** 执行长按动作。 */
     private void onLongPressZone(boolean isTop) {
         buzz(45);
         if (isTop) {
-            // 上部长按：在「进入放映 / 退出放映」之间切换
+            // 切换放映状态
             slideshowOn = !slideshowOn;
             send(slideshowOn ? "ppt_start" : "ppt_exit");
             showHint(getString(slideshowOn ? R.string.immersion_slideshow_start
                     : R.string.immersion_slideshow_stop));
         } else {
-            // 下部长按：退出沉浸模式
+            // 退出沉浸模式
             showHint(getString(R.string.immersion_exit));
             main.postDelayed(new Runnable() {
                 @Override
@@ -205,7 +179,7 @@ public class ImmersionActivity extends Activity {
         }).start();
     }
 
-    /** 短提示：黑屏下短暂显示，随后自动隐藏，避免常亮文字干扰放映。 */
+    /** 显示短提示。 */
     private void showHint(final String text) {
         if (hint == null) return;
         hint.setText(text);
@@ -221,7 +195,7 @@ public class ImmersionActivity extends Activity {
         }
     };
 
-    /** 震动反馈；无震动硬件时静默忽略。 */
+    /** 震动反馈。 */
     private void buzz(int ms) {
         try {
             Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -234,14 +208,11 @@ public class ImmersionActivity extends Activity {
                 }
             }
         } catch (Throwable ignored) {
-            // 无震动硬件或权限受限时静默忽略，不影响控制指令发出
+            // 无震动硬件时忽略
         }
     }
 
-    /**
-     * 音量键 ≡ 屏幕上下区：短按上=上一页，短按下=下一页；按住不放则触发对应长按。
-     * 返回 true 表示事件已被消费，系统不再调整媒体音量。
-     */
+    /** 音量键映射翻页。 */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN) {
@@ -276,7 +247,7 @@ public class ImmersionActivity extends Activity {
         return super.onKeyUp(keyCode, event);
     }
 
-    /** 拦截返回键：放映中误触返回不应退出沉浸模式，改为提示正确退出方式。 */
+    /** 拦截返回键。 */
     @Override
     public void onBackPressed() {
         showHint(getString(R.string.immersion_exit_tip));
@@ -284,12 +255,12 @@ public class ImmersionActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        // 共用连接：只摘掉本页回调，不能 stop（主页还在用同一条）
+        // 摘除本页回调
         try { if (conn != null) conn.setListener(null); } catch (Throwable ignored) { }
         super.onDestroy();
     }
 
-    /** 取构建令牌前 4 位作为内部标识；仅用于日志区分，无其它用途。 */
+    /** 取令牌前 4 位作内部标识。 */
     static String buildTag() {
         return BUILD_TOKEN.substring(0, 4);
     }

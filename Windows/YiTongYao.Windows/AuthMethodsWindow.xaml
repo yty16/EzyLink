@@ -1,8 +1,8 @@
-<Window x:Class="YiTongYao.Windows.AuthMethodsWindow"
+﻿<Window x:Class="YiTongYao.Windows.AuthMethodsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="认证方式" Height="520" Width="620"
-        Background="#1b1136" Foreground="#ECEAFF"
+        Background="{DynamicResource AppBg}" Foreground="{DynamicResource AppFg}"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Icon="Assets\vty_icon.ico">
     <Grid Margin="16">
@@ -15,41 +15,41 @@
 
         <TextBlock Grid.Row="0" Text="已登记的认证方式" FontSize="14" FontWeight="Bold" Margin="0,0,0,8"/>
 
-        <Border Grid.Row="1" Background="#160d2e" BorderBrush="#3a2a6e" BorderThickness="1" Padding="6">
+        <Border Grid.Row="1" Background="{DynamicResource AppLogBg}" BorderBrush="{DynamicResource AppBorder}" BorderThickness="1" Padding="6">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <ListBox x:Name="MethodList" Grid.Row="0" Background="Transparent" Foreground="#ECEAFF"
+                <ListBox x:Name="MethodList" Grid.Row="0" Background="Transparent" Foreground="{DynamicResource AppFg}"
                          BorderThickness="0" SelectionChanged="MethodList_SelectionChanged"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
-                    <Button x:Name="AddPwdBtn" Content="添加密码" Background="#3a2a6e" Foreground="#ECEAFF"
+                    <Button x:Name="AddPwdBtn" Content="添加密码" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
                             BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddPwdBtn_Click"/>
-                    <Button x:Name="AddSystemBtn" Content="添加系统解锁" Background="#3a2a6e" Foreground="#ECEAFF"
+                    <Button x:Name="AddSystemBtn" Content="添加系统解锁" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
                             BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddSystemBtn_Click"/>
-                    <Button x:Name="AddUsbBtn" Content="登记U盘" Background="#3a2a6e" Foreground="#ECEAFF"
+                    <Button x:Name="AddUsbBtn" Content="登记U盘" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
                             BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddUsbBtn_Click"/>
-                    <Button x:Name="EditBtn" Content="修改" Background="#3a2a6e" Foreground="#ECEAFF"
+                    <Button x:Name="EditBtn" Content="修改" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
                             BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="EditBtn_Click"/>
-                    <Button x:Name="RemoveBtn" Content="删除" Background="#6e2a3a" Foreground="#ECEAFF"
+                    <Button x:Name="RemoveBtn" Content="删除" Background="{DynamicResource AppDangerBg}" Foreground="{DynamicResource AppFg}"
                             BorderThickness="0" Padding="10,5" Click="RemoveBtn_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Row="2" Background="#251846" CornerRadius="8" Padding="10" Margin="0,10,0,0">
+        <Border Grid.Row="2" Background="{DynamicResource AppSurface}" CornerRadius="8" Padding="10" Margin="0,10,0,0">
             <StackPanel>
                 <TextBlock x:Name="OpsTitle" Text="保护的操作" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
                 <WrapPanel x:Name="OpsPanel" Orientation="Horizontal"/>
                 <CheckBox x:Name="TwoFactorBox" Content="启用双因子（需两种不同类别的认证方式）"
-                          Foreground="#ECEAFF" FontSize="12" Margin="0,8,0,0"
+                          Foreground="{DynamicResource AppFg}" FontSize="12" Margin="0,8,0,0"
                           Checked="TwoFactor_Changed" Unchecked="TwoFactor_Changed"/>
             </StackPanel>
         </Border>
 
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button x:Name="CloseBtn" Content="关闭" Width="90" Background="#36E2E8" Foreground="#11102A"
+            <Button x:Name="CloseBtn" Content="关闭" Width="90" Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}"
                     FontWeight="Bold" BorderThickness="0" Padding="10,6" Click="CloseBtn_Click"/>
         </StackPanel>
     </Grid>

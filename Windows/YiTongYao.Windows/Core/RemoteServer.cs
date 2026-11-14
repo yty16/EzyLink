@@ -3,13 +3,7 @@ using System.Net.Sockets;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// TCP 远控服务端：负责监听端口与接受连接。
-///
-/// 连接建立后，按行解析 JSON、auth 握手、高危指令门禁等<strong>会话层</strong>职责
-/// 统一交给 <see cref="SessionRunner"/>。传输层与会话层分离后，
-/// 后续若接入其它传输通道（如蓝牙、串口）可直接复用同一套协议实现。
-/// </summary>
+/// <summary>TCP 远控服务端：监听端口并接受连接。</summary>
 internal sealed class RemoteServer : IDisposable
 {
     private TcpListener? _listener;
@@ -27,10 +21,7 @@ internal sealed class RemoteServer : IDisposable
         _log = log;
     }
 
-    /// <summary>
-    /// 启动监听。端口被占用时抛出 SocketException，由调用方转换为友好提示。
-    /// 注意：失败时不会留下半初始化状态（listener 先建后绑，绑定失败即返回）。
-    /// </summary>
+    /// <summary>启动监听。</summary>
     public Task StartAsync()
     {
         if (IsRunning) return Task.CompletedTask;
@@ -58,11 +49,7 @@ internal sealed class RemoteServer : IDisposable
         _log?.Invoke("服务已停止");
     }
 
-    /// <summary>
-    /// 接受连接循环。关键：监听器停止 / 释放后 Accept 会持续抛异常，
-    /// 若像旧实现那样 catch 后 continue，会形成无间隔的死循环刷日志，
-    /// 把 UI 线程（日志同步刷新）彻底拖死 —— 这正是「点停止/启动后未响应」的根因。
-    /// </summary>
+    /// <summary>接受连接循环。</summary>
     private async Task AcceptLoopAsync(CancellationToken ct)
     {
         while (!ct.IsCancellationRequested)
@@ -92,9 +79,7 @@ internal sealed class RemoteServer : IDisposable
         }
     }
 
-    /// <summary>
-    /// 处理一条 TCP 连接：把网络流交给与传输无关的会话层。
-    /// </summary>
+    /// <summary>处理一条 TCP 连接。</summary>
     private async Task HandleClientAsync(TcpClient client, CancellationToken ct)
     {
         var remote = client.Client.RemoteEndPoint?.ToString() ?? "?";

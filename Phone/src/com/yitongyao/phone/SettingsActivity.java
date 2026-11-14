@@ -18,7 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-/** 手机端连接设置：电脑 IP / 端口 / 配对码 / MAC，以及自动连接与自动发现。 */
+/** 连接设置页。 */
 public class SettingsActivity extends Activity {
 
     private EditText editIp;
@@ -85,7 +85,7 @@ public class SettingsActivity extends Activity {
                         .putString("conn_mode", currentMode())
                         .putBoolean("auto_connect", chkAutoConnect.isChecked())
                         .apply();
-                // 把当前连接设置写回设备列表中的「当前设备」，避免切换 / 重装后丢失
+                // 同步设置到当前设备
                 store.syncCurrentFromPrefs();
                 finish();
             }
@@ -128,10 +128,10 @@ public class SettingsActivity extends Activity {
         return "auto";
     }
 
-    /** 广播搜索局域网内的电脑（不需要互联网）。 */
+    /** 搜索局域网电脑。 */
     private void doSearch() {
         searchResult.setText("正在搜索…");
-        searchResult.setTextColor(Color.parseColor("#B26A00"));
+        searchResult.setTextColor(getResources().getColor(R.color.status_connecting));
         new Thread(new Runnable() {
             public void run() {
                 final java.util.List<String> found =
@@ -141,21 +141,21 @@ public class SettingsActivity extends Activity {
                         if (found.isEmpty()) {
                             searchResult.setText("没有搜到。请确认电脑端易通遥已开启服务，" +
                                     "且手机与电脑在同一 WiFi 或已连上电脑的移动热点。");
-                            searchResult.setTextColor(Color.parseColor("#B00020"));
+                            searchResult.setTextColor(getResources().getColor(R.color.danger));
                             return;
                         }
                         String ip = found.get(0);
                         editIp.setText(ip);
                         editPort.setText(prefs.getString("port", "7788"));
                         searchResult.setText("已找到电脑：" + ip + "（已填入上方，点保存即可）");
-                        searchResult.setTextColor(Color.parseColor("#0a8a8f"));
+                        searchResult.setTextColor(getResources().getColor(R.color.status_connected));
                     }
                 });
             }
         }).start();
     }
 
-    /** 扫码把一台新电脑加入设备列表（同 IP+端口则合并）。 */
+    /** 扫码添加设备。 */
     private static final int REQ_SCAN_ADD = 9301;
 
     private void startScanAdd() {
@@ -199,11 +199,11 @@ public class SettingsActivity extends Activity {
         }
         Device saved = store.upsertFromQr(d);
         store.activate(saved.id);
-        // 重新加载表单以反映刚加入 / 切换的设备
+        // 重新加载表单
         recreate();
     }
 
-    /** 删除当前设备；删除后自动切到另一台或退回。 */
+    /** 删除当前设备。 */
     private void confirmDeleteCurrent() {
         final Device cur = store.current();
         if (cur == null) {
@@ -224,7 +224,7 @@ public class SettingsActivity extends Activity {
                 .show();
     }
 
-    /** 表冠（旋转侧键 / 表圈）旋转 → 设置页纵向滚动。 */
+    /** 表冠滚动页面。 */
     @Override
     public boolean onGenericMotionEvent(MotionEvent event) {
         if (Rotary.scroll(this, event, R.id.scroll, 100f)) return true;

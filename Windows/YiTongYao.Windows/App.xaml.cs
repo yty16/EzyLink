@@ -9,25 +9,31 @@ namespace YiTongYao.Windows;
 
 public partial class App : System.Windows.Application
 {
-    /// <summary>
-    /// 全局异常兜底：任何未捕获异常都写入崩溃日志并弹出提示，
-    /// 不再让程序「未响应后直接消失」（旧版没有任何异常处理，异常即崩溃退出）。
-    /// </summary>
+    /// <summary>全局异常兜底：未捕获异常写入崩溃日志并提示。</summary>
     protected override void OnStartup(StartupEventArgs e)
     {
-        // 托盘类应用：收起主窗口（例如「打开主窗口时要求密码」未解锁、或隐藏托盘图标）后
-        // 程序仍需存活以保留热键 / 托盘入口，因此采用「显式退出」模式，只有明确的退出路径才结束进程。
+        // 显式退出模式（托盘驻留时程序需存活）
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         DispatcherUnhandledException += OnDispatcherUnhandledException;
         AppDomain.CurrentDomain.UnhandledException += OnDomainUnhandledException;
         TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
         base.OnStartup(e);
 
-        // 所有窗口显示前按当前屏幕 / DPI 收进工作区，避免小屏或高缩放下被裁切
+        // 应用外观主题（先于窗口创建，保证首屏正确）
+        try
+        {
+            var themePrefs = YiTongYao.Core.SettingsStore.Load();
+            YiTongYao.Core.ThemeManager.ApplyTheme(
+                YiTongYao.Core.ThemeManager.ParseMode(themePrefs.ThemeMode), themePrefs.AccentHex);
+            YiTongYao.Core.ThemeManager.RegisterSystemThemeWatcher();
+        }
+        catch { }
+
+        // 窗口创建前按屏幕/DPI 收进工作区，避免被裁切
         EventManager.RegisterClassHandler(typeof(Window), FrameworkElement.LoadedEvent,
             new RoutedEventHandler((sender, _) => { if (sender is Window w) FitWindow(w); }));
 
-        // ---- 单实例互斥：已有实例在运行时，通知它把窗口提到前台并弹出「已在运行」提示 ----
+        // 单实例互斥：已有实例则通知其置顶并提示
         if (!YiTongYao.Core.SingleInstance.TryBecomePrimary())
         {
             YiTongYao.Core.SingleInstance.Signal("SHOW");
@@ -41,7 +47,7 @@ public partial class App : System.Windows.Application
 
             if (restart)
             {
-                // 先通知主实例退出并释放互斥体，再等待本实例接管
+                // 通知主实例退出并释放互斥体，再接管
                 YiTongYao.Core.SingleInstance.Signal("RESTART");
                 if (!WaitBecomePrimary())
                 {
@@ -58,14 +64,13 @@ public partial class App : System.Windows.Application
             }
         }
 
-        // 主实例：启动 IPC 监听（重复启动时用于把窗口提到前台 / 接收重启指令）
+        // 主实例：启动 IPC 监听（置顶 / 重启）
         YiTongYao.Core.SingleInstance.StartServer(
             onShow: () => Dispatcher.BeginInvoke(() => (_mainWindow as MainWindow)?.BringToFront()),
             onRestart: () => Dispatcher.BeginInvoke(() => (_mainWindow as MainWindow)?.ForceClose()));
         Exit += (_, _) => YiTongYao.Core.SingleInstance.Release();
 
-        // 隐私同意闸门：首次启动（或已撤回同意）时先征求同意，未同意则不创建主窗口直接退出。
-        // 注意 StartupUri 已移除，主窗口在此处显式创建，确保闸门先于任何服务 / 托盘初始化。
+        // 隐私同意闸门：未同意则不创建主窗口直接退出
         var s = YiTongYao.Core.SettingsStore.Load();
         if (!s.PrivacyAccepted)
         {
@@ -89,9 +94,7 @@ public partial class App : System.Windows.Application
 
     private MainWindow? _mainWindow;
 
-    /// <summary>
-    /// 轮询等待成为主实例（主实例退出并释放互斥体后本实例才能接管）。最多约 6 秒。
-    /// </summary>
+    /// <summary>轮询等待成为主实例，最多约 6 秒。</summary>
     private static bool WaitBecomePrimary()
     {
         for (int i = 0; i < 60; i++)
@@ -102,12 +105,12 @@ public partial class App : System.Windows.Application
         return false;
     }
 
-    /// <summary>把窗口限制在当前屏幕工作区内，超出时按比例缩小并移回可见范围。</summary>
+    /// <summary>把窗口限制在当前屏幕工作区内。</summary>
     public static void FitWindow(Window w)
     {
         try
         {
-            // 用窗口所在显示器的工作区；SystemParameters.WorkArea 只返回主屏，多屏下会把副屏窗口拉回主屏
+            // 取窗口所在显示器工作区（避免多屏下回主屏）
             Rect area;
             try
             {
@@ -123,7 +126,7 @@ public partial class App : System.Windows.Application
             double width = area.Width / dpi.DpiScaleX;
             double height = area.Height / dpi.DpiScaleY;
 
-            // 上限取工作区整幅，最大化时才不会因上限偏小而四周留白
+            // 上限取工作区整幅，最大化时不留白
             w.MaxWidth = Math.Max(w.MinWidth, width);
             w.MaxHeight = Math.Max(w.MinHeight, height);
             if (w.WindowState == WindowState.Maximized) return;
@@ -150,7 +153,7 @@ public partial class App : System.Windows.Application
                 "程序遇到一个未处理的错误，已记录到日志，你可以继续使用或重新启动程序。\n\n" +
                 e.Exception.Message + "\n\n日志位置：\n" + path,
                 "易通遥 运行时错误", MessageBoxButton.OK, MessageBoxImage.Warning);
-            e.Handled = true; // 标记已处理，防止进程直接退出
+            e.Handled = true; // 标记已处理，防止进程退出
         }
         catch
         {
@@ -171,22 +174,18 @@ public partial class App : System.Windows.Application
     private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         try { CrashLogger.Write(e.Exception); } catch { }
-        e.SetObserved(); // 避免后台任务异常在 GC 时终止进程
+        e.SetObserved(); // 避免后台任务异常终止进程
     }
 }
 
-/// <summary>
-/// 崩溃日志写入器：保存到 %LOCALAPPDATA%\YiTongYao\logs\crash-yyyyMMdd.log
-/// </summary>
+/// <summary>崩溃日志：写入 %LOCALAPPDATA%\YiTongYao\logs\crash-yyyyMMdd.log。</summary>
 internal static class CrashLogger
 {
     public static string DirectoryPath =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                      "YiTongYao", "logs");
 
-    /// <summary>
-    /// 运行日志（与界面日志同步写入），用于排查「程序看起来没反应 / 自己退出」这类问题。
-    /// </summary>
+    /// <summary>运行日志（与界面日志同步，排查无响应/自退）。</summary>
     public static void LogRun(string msg)
     {
         try

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll"
     android:layout_width="match_parent" android:layout_height="match_parent">
@@ -6,14 +6,14 @@
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:padding="@dimen/scr_pad" android:gravity="center_horizontal">
         <TextView android:text="@string/app_name_en" android:textSize="9sp"
-            android:textColor="#6E6E88" android:layout_marginBottom="1dp"
+            android:textColor="@color/fg_dim" android:layout_marginBottom="1dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <TextView android:id="@+id/status" android:text="@string/status_ready"
-            android:textSize="13sp" android:textColor="#36E2E8"
+            android:textSize="13sp" android:textColor="@color/accent"
             android:layout_marginBottom="2dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <TextView android:id="@+id/connState" android:text="@string/conn_idle"
-            android:textSize="11sp" android:textColor="#9E9E9E"
+            android:textSize="11sp" android:textColor="@color/fg_dim"
             android:layout_marginBottom="4dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -24,7 +24,7 @@
             <Button android:id="@+id/btnDevices" style="@style/Btn" android:text="@string/devices_title"/>
         </LinearLayout>
         <TextView android:id="@+id/immersionHintMain" android:text="@string/immersion_help"
-            android:textSize="9sp" android:textColor="#9E9E9E"
+            android:textSize="9sp" android:textColor="@color/fg_dim"
             android:layout_marginBottom="4dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"

@@ -1,6 +1,5 @@
 ﻿
-; YiTongYao Windows installer (NSIS MUI2)
-; 结构对标 PeekShield 安装器：欢迎 -> 许可 -> 组件 -> 目录 -> 安装方式(标准/全新) -> 安装 -> 完成
+; Windows 安装器（NSIS MUI2）
 Unicode True
 SetCompressor lzma
 
@@ -17,7 +16,7 @@ SetCompressor lzma
 !define EXENAME "YiTongYao.exe"
 !define APPDIR "$LOCALAPPDATA\Programs\${APPNAME}"
 !define DATADIR "$LOCALAPPDATA\${APPNAMEEN}"
-; PROJECTROOT 可由命令行传入（makensis /DPROJECTROOT=...），默认按脚本位置推断
+; PROJECTROOT 可由命令行传入
 !ifndef PROJECTROOT
   !define PROJECTROOT "${__FILEDIR__}\.."
 !endif
@@ -156,7 +155,7 @@ FunctionEnd
 Section "主程序（必需）" SEC_MAIN
   SectionIn RO
 
-  ; 覆盖更新前先结束正在运行的进程，等待其释放文件句柄
+  ; 结束正在运行的进程
   DetailPrint "正在关闭已运行的 ${APPNAME} 进程..."
   ExecWait 'taskkill /F /IM "${EXENAME}"' $0
   Sleep 2000
@@ -170,7 +169,7 @@ Section "主程序（必需）" SEC_MAIN
     RMDir /r "${DATADIR}"
   ${EndIf}
 
-  ; 注册卸载信息（用户级安装，写入 HKCU）
+  ; 注册卸载信息
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayName" "${APPNAME}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "DisplayVersion" "${APPVERSION}"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "Publisher" "${PUBLISHER}"
@@ -180,8 +179,7 @@ Section "主程序（必需）" SEC_MAIN
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "NoModify" "1"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "NoRepair" "1"
 
-  ; 防火墙入站放行：不放行时手机 / 手表连不上本机，表现为「点了按钮没反应」。
-  ; 用户级安装可能没有管理员权限，失败不中断安装 —— 程序内「防火墙放行」按钮可补做。
+  ; 防火墙入站放行
   DetailPrint "正在配置防火墙入站规则…"
   ExecWait 'netsh advfirewall firewall add rule name="${APPNAME} 远程控制" dir=in action=allow enable=yes profile=any program="$INSTDIR\${EXENAME}"' $3
   ${If} $3 != 0
@@ -233,7 +231,7 @@ Section "Uninstall"
   ExecWait 'taskkill /F /IM "${EXENAME}" /FI "STATUS eq RUNNING"' $R1
   Sleep 500
 
-  ; 清除开机自启项，避免卸载后系统仍尝试启动一个已删除的程序
+  ; 清除开机自启项
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "${APPNAMEEN}"
 
   ; 清除防火墙放行规则

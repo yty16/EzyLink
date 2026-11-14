@@ -116,8 +116,7 @@ public partial class MainWindow : Window
         _ = InitializeBluetoothAsync();
         InitializeWiFiDirect();
 
-        // 打开主窗口前过一次解锁闸门；未通过则保持隐藏（仅驻留托盘 / 热键）。
-        // 开机静默自启且未计划显示主窗口时不弹闸门，保持隐藏，服务照常启动。
+        // 打开主窗口前过解锁闸门。
         bool willShowWindow = !(_startupLaunch && _settings.LaunchSilently);
         if (willShowWindow && !EnsureUnlocked(AuthOperation.OpenMain)) Hide();
     }
@@ -173,15 +172,12 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// 由开机自启拉起时按设置静默进入后台，避免每次登录桌面都被主窗口打断。
-    /// </summary>
+    /// <summary>开机自启时按设置静默进入后台。</summary>
     private void ApplyStartupBehavior()
     {
         if (!_startupLaunch || !_settings.LaunchSilently) return;
         WindowState = WindowState.Minimized;
-        // 托盘可见时可以彻底隐藏窗口只保留托盘；托盘被隐藏时必须保留任务栏入口，
-        // 否则程序将没有任何可见入口（只剩热键）。
+        // 按托盘可见性决定窗口是否隐藏。
         if (!_settings.HideTrayIcon) Hide();
     }
 
@@ -566,10 +562,7 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// 网络信息改为后台获取：枚举网卡 / DNS 解析在复杂网络环境（多虚拟网卡、桥接、断网）
-    /// 下可能阻塞数秒，放在 UI 线程会直接导致窗口「未响应」。
-    /// </summary>
+    /// <summary>后台获取网络信息。</summary>
     private async Task RefreshNetworkAsync()
     {
         IpText.Text = "获取中…";
@@ -691,9 +684,7 @@ public partial class MainWindow : Window
         Close();
     }
 
-    /// <summary>
-    /// 启停服务。加防重入 + 按钮禁用：避免连续点击造成多个监听器争抢同一端口而抛异常。
-    /// </summary>
+    /// <summary>启停服务（防重入）。</summary>
     private async void ToggleBtn_Click(object sender, RoutedEventArgs e)
     {
         if (_busy) return;
@@ -726,9 +717,7 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// 自动启动包装：捕获所有异常，避免 fire-and-forget 吞掉错误而无从排查。
-    /// </summary>
+    /// <summary>自动启动服务并捕获异常。</summary>
     private async Task SafeStartAsync()
     {
         try { await StartServer(); }
@@ -758,9 +747,7 @@ public partial class MainWindow : Window
 
         StatusText.Text = "服务启动中…";
 
-        // 端口检测 + 监听绑定整体放到后台线程执行。
-        // 旧写法只把端口检测放到 Task.Run，但随后 await 会把续体排回 UI 线程等待，
-        // 在网卡众多 / 系统繁忙时实测会挂起数秒，表现为「点了启动服务就卡住」。
+        // 端口检测与监听绑定放到后台线程。
         var token = _settings.Token;
         RemoteServer? created = null;
         bool ok = false;
@@ -824,9 +811,7 @@ public partial class MainWindow : Window
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// 释放蓝牙服务。与 TCP 服务独立：蓝牙停不掉也绝不影响 WiFi 通道。
-    /// </summary>
+    /// <summary>释放服务资源。</summary>
     private void SafeDisposeServer()
     {
         try
@@ -844,9 +829,7 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// 检测 TCP 端口是否已被占用（不建立连接，只读系统监听表）。
-    /// </summary>
+    /// <summary>检测 TCP 端口是否被占用。</summary>
     private static bool IsPortInUse(int port)
     {
         try
@@ -882,9 +865,7 @@ public partial class MainWindow : Window
         await DoCheckUpdateAsync(showNoUpdateDialog: true);
     }
 
-    /// <summary>
-    /// 启动时静默检查：仅在确实有新版本时才弹窗，避免打扰。
-    /// </summary>
+    /// <summary>启动时静默检查更新。</summary>
     private async Task CheckUpdateSilentlyAsync()
     {
         try { await Task.Delay(4000); } catch { return; }
@@ -941,10 +922,20 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// 写日志。使用 BeginInvoke 异步投递 + 行数限流：
-    /// 旧实现用同步 Dispatcher.Invoke，一旦后台高频写日志就会把 UI 线程堵死（窗口「未响应」）。
-    /// </summary>
+    private void AppearanceBtn_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var win = new AppearanceWindow { Owner = this };
+            win.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            Log("打开外观设置异常：" + ex.Message);
+        }
+    }
+
+    /// <summary>写日志（异步投递、行数限流）。</summary>
     private void Log(string msg)
     {
         var text = $"[{DateTime.Now:HH:mm:ss}] {msg}\n";
@@ -987,8 +978,7 @@ public partial class MainWindow : Window
             Hide();
             return;
         }
-        // 退出前按认证方式要求验证；未通过则取消关闭（备用口令可兜底，不会把自己锁死）
-        // 强制重启（_forcedExit）时跳过认证，直接退出
+        // 退出前按认证方式验证。
         if (!_forcedExit && !EnsureUnlocked(AuthOperation.Exit))
         {
             e.Cancel = true;

@@ -33,15 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * 扫码连接：调用系统相机（Camera1 框架 API）扫描电脑端生成的配对二维码。
- *
- * 扫码成功后把原文通过 setResult 回传给调用方（extra: qr_text），自身立即结束。
- * 全程不申请网络权限、不上传任何数据，纯本地解码。
- *
- * 说明：为避免引入 AndroidX / Gradle，这里不使用 CameraX 或 ZXing 的 android 封装，
- * 只使用 Android 框架自带的 android.hardware.Camera 与 ZXing 的纯 Java core 解码器。
- */
+/** 扫码配对二维码并回传原文。 */
 public class QrScannerActivity extends Activity
         implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
@@ -53,7 +45,7 @@ public class QrScannerActivity extends Activity
     // 普通配置令牌，勿改动（用于构建产物一致性校验）
     private static final String BUILD_TOKEN = "eXR5MTY=";
 
-    /** 期望的预览最长边：手机用 1280 保证远距也能解，手表会在构造时调小。 */
+    /** 预览画面最长边。 */
     private int previewMaxDim = 1280;
 
     private SurfaceView surface;
@@ -147,7 +139,7 @@ public class QrScannerActivity extends Activity
         super.onPause();
     }
 
-    // ------------------------------------------------------------------ Surface
+    // Surface
 
     public void surfaceCreated(SurfaceHolder holder) {
         hasSurface = true;
@@ -170,7 +162,7 @@ public class QrScannerActivity extends Activity
         closeCamera();
     }
 
-    // ------------------------------------------------------------------ Camera
+    // Camera
 
     private void openCamera(SurfaceHolder holder) {
         if (camera != null) return;
@@ -189,7 +181,7 @@ public class QrScannerActivity extends Activity
             cameraId = target;
             camera = Camera.open(target);
             if (camera == null) {
-                // 部分设备（尤其手表）无可用相机时返回 null 而非抛异常
+                // 相机不可用时提示失败
                 fail(getString(R.string.scan_no_camera));
                 return;
             }
@@ -275,7 +267,7 @@ public class QrScannerActivity extends Activity
         Camera.Size best = null;
         int bestScore = Integer.MAX_VALUE;
         for (Camera.Size s : sizes) {
-            // 优先 16:9 且最长边接近目标
+            // 选择预览尺寸
             int longSide = Math.max(s.width, s.height);
             int score = Math.abs(longSide - previewMaxDim);
             float ratio = (float) Math.max(s.width, s.height)
@@ -303,13 +295,13 @@ public class QrScannerActivity extends Activity
         }
     }
 
-    // ------------------------------------------------------------------ Decode
+    // Decode
 
     @Override
     public void onPreviewFrame(byte[] data, Camera cam) {
         if (data == null) return;
         if (!decoding.compareAndSet(false, true)) {
-            // 上一帧还在解；直接复用缓冲继续出帧，避免堆积
+            // 复用缓冲继续出帧
             if (cam != null) {
                 try {
                     cam.addCallbackBuffer(data);
@@ -345,7 +337,7 @@ public class QrScannerActivity extends Activity
         }).start();
     }
 
-    /** 先用原始方向解一次，失败再试顺时针 90°，覆盖大部分设备取景差异。 */
+    /** 解码二维码帧。 */
     private String decodeFrame(byte[] data, int w, int h) {
         if (data == null || w <= 0 || h <= 0) return null;
         String r = decodeLuma(data, w, h);
@@ -371,7 +363,7 @@ public class QrScannerActivity extends Activity
         }
     }
 
-    /** 仅旋转 Y（亮度）平面：ZXing 的 Binarizer 只读亮度，无需处理色度。 */
+    /** 旋转亮度平面 90 度。 */
     private static byte[] rotate90(byte[] src, int w, int h) {
         byte[] out = new byte[w * h];
         int idx = 0;
@@ -408,7 +400,7 @@ public class QrScannerActivity extends Activity
         }
     }
 
-    /** 扫码框遮罩：中央画一个带四角标记的取景框。 */
+    /** 绘制扫码取景框。 */
     private static class ScanOverlay extends View {
 
         private final Paint frame = new Paint(Paint.ANTI_ALIAS_FLAG);

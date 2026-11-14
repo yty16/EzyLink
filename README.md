@@ -18,9 +18,9 @@
 
 | 端           | 形态                      | 版本      | 说明                                                                                   |
 | ----------- | ----------------------- | ------- | ------------------------------------------------------------------------------------ |
-| **Windows** | `exe`（.NET 8 WPF）       | 1.9.1.4 | 电脑主机端，含 Wi-Fi Direct 直连、蓝牙直连、安全认证（密码 / Windows Hello / U 盘）、扫码连接、系统托盘、开机自启、自动更新      |
-| **Watch**   | `apk`（Android，圆屏/方屏自适应） | 1.6.0.1 | 手表端，支持多设备记录与切换、主页面/设置页表冠旋转滑动、蓝牙直连、旋转表冠翻页、沉浸模式防抬腕亮屏、扫码连接、打开即自动连接（测试环境为HW watch 4 pro） |
-| **Phone**   | `apk`（Android，竖屏大屏）     | 1.4.0.1 | 手机端，支持多设备记录与切换、蓝牙直连、扫码连接、打开即自动连接                                                     |
+| **Windows** | `exe`（.NET 8 WPF）       | 1.9.1.5 | 电脑主机端，含 Wi-Fi Direct 直连、蓝牙直连、安全认证（密码 / Windows Hello / U 盘）、扫码连接、系统托盘、开机自启、自动更新      |
+| **Watch**   | `apk`（Android，圆屏/方屏自适应） | 1.6.0.2 | 手表端，支持多设备记录与切换、主页面/设置页表冠旋转滑动、蓝牙直连、旋转表冠翻页、沉浸模式防抬腕亮屏、扫码连接、打开即自动连接（测试环境为HW watch 4 pro） |
+| **Phone**   | `apk`（Android，竖屏大屏）     | 1.4.0.2 | 手机端，支持多设备记录与切换、蓝牙直连、扫码连接、打开即自动连接                                                     |
 
 - `Windows/YiTongYao.Windows/` —— Windows 主机端（.NET 8 WPF）
 - `Watch/` —— WearOS 手表端
@@ -31,7 +31,7 @@
 - `Protocol.md` —— 指令协议详细定义
 - `Tools/` —— 图标生成脚本 `gen_icons.py`、APK 构建脚本 `build_apk.py` / `build_apk.bat`（图标与构建脚本说明见对应文件头部）
 - `CHANGELOG.md` —— 三端更新日志
-- `LICENSE` —— 许可证全文（**GPL-3.0**，GNU 通用公共许可证第 3 版）
+- `LICENSE` —— 许可证全文（**GPL-3.0-or-later**，GNU 通用公共许可证第 3 版，或（由你选择）任何更高版本）
 - `PRIVACY.md` —— 隐私政策（数据收集范围、本地存储、撤回同意等）
 - `TERMS.md` —— 用户协议（使用限制、知识产权、责任限制等）
 - `DISCLAIMER.md` —— 免责声明（「现状」提供、远程操作破坏性提示、合法使用等）
@@ -40,10 +40,10 @@
 
 ## 安装包
 
-- `installer/易通遥-1.9.1.4-win-x64-setup.exe` —— Windows 安装程序（自包含 .NET 运行时，无需预装 .NET）
-- `dist/易通遥-1.9.1.4-x64-portable.zip` —— Windows 便携版（解压即用）
-- `dist/yitongyao-watch-1.6.0.1.apk` —— 手表端 APK
-- `dist/yitongyao-phone-1.4.0.1.apk` —— 手机端 APK
+- `installer/易通遥-1.9.1.5-win-x64-setup.exe` —— Windows 安装程序（自包含 .NET 运行时，无需预装 .NET）
+- `dist/易通遥-1.9.1.5-x64-portable.zip` —— Windows 便携版（解压即用）
+- `dist/yitongyao-watch-1.6.0.2.apk` —— 手表端 APK
+- `dist/yitongyao-phone-1.4.0.2.apk` —— 手机端 APK
 
 ## 离线直连（不需要路由器 / 不需要互联网）
 
@@ -371,6 +371,6 @@ adb install Phone/phone-release.apk        # 手机
 
 **许可**
 
-本软件以 GNU 通用公共许可证 v3.0（GPL-3.0）发布，详见 `LICENSE`。您可以自由使用、研究、修改与再分发本软件（含商业用途）；衍生作品须以相同许可证（GPL-3.0）开源。隐私政策见 `PRIVACY.md`。 使用前请先在应用内同意隐私告知
+本软件以 GNU 通用公共许可证 v3.0-or-later（GPL-3.0-or-later）发布，详见 `LICENSE`。您可以自由使用、研究、修改与再分发本软件（含商业用途）；衍生作品须以相同许可证（GPL-3.0-or-later）开源。隐私政策见 `PRIVACY.md`。 使用前请先在应用内同意隐私告知
 
 部分内容由AI大模型辅助完成

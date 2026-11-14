@@ -3,9 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 系统级操作：锁屏、睡眠、休眠、关机、重启。
-/// </summary>
+/// <summary>系统级操作：锁屏、睡眠、休眠、关机、重启。</summary>
 internal static class SystemController
 {
     [DllImport("user32.dll")]

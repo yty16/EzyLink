@@ -6,10 +6,7 @@ using System.Text;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 安全认证服务：仿照窥屿盾（PeekShield）的密码逻辑，覆盖密码 / 系统解锁（Windows Hello）/ U 盘三类方式，
-/// 不含人脸识别与快捷验证。
-/// </summary>
+/// <summary>安全认证服务。</summary>
 internal static class AuthService
 {
     // PBKDF2：310000 次迭代（OWASP 对 PBKDF2-HMAC-SHA256 的推荐量级）+ 随机盐 + 32 字节输出
@@ -146,8 +143,7 @@ internal static class AuthService
 
     public static List<AuthMethodEntry> MethodsFor(SettingsStore s, string operation)
     {
-        // 只认「明确保护该操作」的方式；未配置保护范围的方式视为保护全部操作。
-        // 没有方式保护该操作时返回空表 —— 该操作无需认证。
+        // 查询保护该操作的认证方式。
         var list = s.AuthMethods.Where(m => m.Operations.Contains(operation)).ToList();
         if (list.Count == 0)
             list = s.AuthMethods.Where(m => m.Operations.Count == 0).ToList();

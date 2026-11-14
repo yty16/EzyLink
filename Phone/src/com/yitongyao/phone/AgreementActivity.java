@@ -8,11 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-/**
- * 首次使用协议与免责声明网关：必须勾选同意后方可进入主界面；
- * 选择「不同意并退出」则直接关闭应用。同意后写入 SharedPreferences，
- * 以后启动不再弹出（与 Windows 端隐私同意闸门保持一致）。
- */
+/** 首次使用协议网关。 */
 public class AgreementActivity extends Activity {
 
     private SharedPreferences prefs;
@@ -52,7 +48,7 @@ public class AgreementActivity extends Activity {
         });
     }
 
-    /** 强制表态：返回键等同退出，不允许绕过。 */
+    /** 拦截返回键。 */
     @Override
     public void onBackPressed() {
         finishAffinity();

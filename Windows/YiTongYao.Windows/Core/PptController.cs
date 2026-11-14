@@ -3,10 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace YiTongYao.Core;
 
-/// <summary>
-/// 通过向 PowerPoint（或兼容软件）前台窗口发送标准快捷键来控制幻灯片放映。
-/// 不依赖 Office 互操作组件，通用性更好。
-/// </summary>
+/// <summary>通过快捷键控制幻灯片放映。</summary>
 internal static class PptController
 {
     // 虚拟键码
@@ -51,9 +48,7 @@ internal static class PptController
 
     private const int SW_RESTORE = 9;
 
-    /// <summary>
-    /// 尝试将 PowerPoint 主窗口置于前台，失败则退回当前前台窗口。
-    /// </summary>
+    /// <summary>将 PowerPoint 窗口置于前台。</summary>
     private static void FocusPresentation()
     {
         IntPtr hwnd = FindWindow("PPTFrameClass", null);

@@ -98,7 +98,7 @@ YTY_DISCOVER
 **响应（电脑端 → 请求来源）**
 
 ```
-{"type":"yty_here","host":"DESKTOP-XXX","port":7788,"version":"1.9.1.4","ips":["192.168.137.1","192.168.1.23"],"bt_available":true,"bt_mac":"4C:0F:3E:27:D4:AD","bt_uuid":"6E8F3A21-5C7B-4D9E-A1F2-0B3C4D5E6F70"}
+{"type":"yty_here","host":"DESKTOP-XXX","port":7788,"version":"1.9.1.5","ips":["192.168.137.1","192.168.1.23"],"bt_available":true,"bt_mac":"4C:0F:3E:27:D4:AD","bt_uuid":"6E8F3A21-5C7B-4D9E-A1F2-0B3C4D5E6F70"}
 ```
 
 | 字段 | 说明 |

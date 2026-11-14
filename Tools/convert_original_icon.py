@@ -1,10 +1,5 @@
 #!/usr/bin/env python3
-# 仅做格式转换与"去白角"，不改动图标设计本身。
-# 源：用户提供的原始图标（VTV 广播标，JPG 无透明通道，设计为"近直角深紫方块 + 白色方底"）。
-# 处理：1) 把圆角方块"之外"与外部白边连通的白色区域透明化（深紫主体与内部元素保留）；
-#       2) 对每个输出尺寸施加略大于原图(约10%)的圆角遮罩，保证角落绝对透明、无白角，
-#          视觉仍为贴合原设计的小圆角方块。
-# 输出：Windows .ico(含 alpha 多尺寸) + .png；Watch/Phone 各密度 ic_launcher.png(含 alpha)。
+# 图标格式转换与去白角，输出 ico/png 及各密度 launcher。
 import os
 import collections
 from PIL import Image, ImageFilter, ImageDraw, ImageChops
@@ -63,7 +58,7 @@ def remove_outer_white(img):
             r, g, b = src[x, y]
             a = 0 if transparent[y * w + x] else 255
             opx[x, y] = (r, g, b, a)
-    # 轻微抗锯齿：对 alpha 边缘做模糊后再阈值，消除硬锯齿
+    # alpha 边缘抗锯齿
     a = out.split()[3].filter(ImageFilter.GaussianBlur(0.6))
     out.putalpha(a.point(lambda v: 0 if v < 40 else (255 if v > 200 else v)))
     return out
@@ -80,7 +75,7 @@ def round_corner_mask(size, ratio=CORNER_RATIO):
 def make_icon(base, size):
     """缩放到目标尺寸并施加圆角遮罩，保证角落绝对透明。"""
     resized = base.resize((size, size), Image.LANCZOS)
-    # 二值化 alpha：消除缩放抗锯齿产生的半透明残留（避免角落出现淡紫/灰色拖影）
+    # 二值化 alpha，消除半透明残留
     a = resized.split()[3].point(lambda v: 0 if v < 120 else 255)
     mask = round_corner_mask(size)
     resized.putalpha(ImageChops.multiply(a, mask))
@@ -91,7 +86,7 @@ print("读取原始图标...")
 base = remove_outer_white(Image.open(SRC).convert("RGB"))
 print("源尺寸:", base.size, " 已去白角(圆角外透明)")
 
-# ---- Windows .ico / png（含 alpha；先生成"角落纯透明"的母图，再由其自动缩放多尺寸）----
+# Windows .ico / png
 ico_path = os.path.join(WIN_ASSETS, "vty_icon.ico")
 png_path = os.path.join(WIN_ASSETS, "vty_icon.png")
 ico_sizes = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)]
@@ -100,7 +95,7 @@ masked.save(png_path)
 masked.save(ico_path, sizes=ico_sizes)
 print("已生成", ico_path, "与", png_path)
 
-# ---- Watch/Phone 各密度 launcher png（含 alpha，圆角外透明）----
+# Watch/Phone 各密度 launcher png
 dpi = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
 for mod, res in [("watch", WATCH_RES), ("phone", PHONE_RES)]:
     for name, size in dpi.items():

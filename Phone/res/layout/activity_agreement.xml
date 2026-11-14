@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
     <ScrollView android:id="@+id/scroll" android:layout_width="match_parent"
@@ -6,31 +6,31 @@
         <LinearLayout android:orientation="vertical" android:padding="16dp"
             android:layout_width="match_parent" android:layout_height="wrap_content">
             <TextView android:text="@string/agree_title" android:textSize="18sp"
-                android:textStyle="bold" android:textColor="#1b1136" android:layout_marginBottom="6dp"
+                android:textStyle="bold" android:textColor="@color/fg" android:layout_marginBottom="6dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/agree_intro" android:textSize="13sp"
-                android:textColor="#5f6b7a" android:layout_marginBottom="10dp"
+                android:textColor="@color/fg_muted" android:layout_marginBottom="10dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/disclaimer_title" android:textSize="15sp"
-                android:textStyle="bold" android:textColor="#1b1136" android:layout_marginBottom="4dp"
+                android:textStyle="bold" android:textColor="@color/fg" android:layout_marginBottom="4dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/disclaimer_text" android:textSize="13sp"
-                android:textColor="#333333" android:lineSpacingExtra="2dp" android:layout_marginBottom="10dp"
+                android:textColor="@color/fg_muted" android:lineSpacingExtra="2dp" android:layout_marginBottom="10dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/terms_title" android:textSize="15sp"
-                android:textStyle="bold" android:textColor="#1b1136" android:layout_marginBottom="4dp"
+                android:textStyle="bold" android:textColor="@color/fg" android:layout_marginBottom="4dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/terms_text" android:textSize="13sp"
-                android:textColor="#333333" android:lineSpacingExtra="2dp" android:layout_marginBottom="8dp"
+                android:textColor="@color/fg_muted" android:lineSpacingExtra="2dp" android:layout_marginBottom="8dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <TextView android:text="@string/agree_note" android:textSize="11sp"
-                android:textColor="#8a86a8" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                android:textColor="@color/fg_dim" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         </LinearLayout>
     </ScrollView>
-    <LinearLayout android:orientation="vertical" android:padding="12dp" android:background="#f2f0fa"
+    <LinearLayout android:orientation="vertical" android:padding="12dp" android:background="@color/surface_alt"
         android:layout_width="match_parent" android:layout_height="wrap_content">
         <CheckBox android:id="@+id/agreeCheck" android:text="@string/agree_check"
-            android:textSize="13sp" android:textColor="#1b1136"
+            android:textSize="13sp" android:textColor="@color/fg"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
             android:layout_height="wrap_content" android:layout_marginTop="6dp">
@@ -40,7 +40,7 @@
             <Button android:id="@+id/agreeAccept" android:text="@string/agree_accept"
                 android:enabled="false" android:layout_weight="1" android:layout_marginStart="6dp"
                 android:layout_width="0dp" android:layout_height="wrap_content"
-                android:textColor="#11102A" android:background="#36E2E8"/>
+                android:textColor="@color/accent_fg" android:background="@color/accent"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

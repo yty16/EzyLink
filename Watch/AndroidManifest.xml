@@ -7,18 +7,18 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!-- 扫码连接：本地相机取景并离线解码，不上传任何画面 -->
+    <!-- 扫码用相机权限。-->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!-- 蓝牙 RFCOMM 直连：Android 12+ 需 BLUETOOTH_CONNECT 运行时权限 -->
+    <!-- 蓝牙权限。-->
     <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
-    <!-- 声明为手表应用；required=false 以便可在华为 Watch 4 Pro(HarmonyOS) 等设备上侧载安装 -->
+    <!-- 手表应用声明。-->
     <uses-feature android:name="android.hardware.type.watch" android:required="false" />
-    <!-- 相机非必需：无摄像头设备仍可手动填 IP 连接 -->
+    <!-- 相机非必需。-->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
     <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 

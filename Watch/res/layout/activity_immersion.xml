@@ -3,8 +3,7 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:background="#000000">
 
-    <!-- 上下两等分触摸区：上=上一页，下=下一页；长按见 ImmersionActivity 说明。
-         圆屏 / 方屏均按屏幕几何自然等分，无需额外适配。 -->
+    <!-- 上下等分触摸区。-->
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent" android:layout_height="match_parent">
         <View android:id="@+id/zoneTop"
@@ -15,7 +14,7 @@
             android:layout_weight="1" android:background="#000000"/>
     </LinearLayout>
 
-    <!-- 操作反馈：默认不可见，操作后短暂显示再隐藏，避免常亮文字干扰放映 -->
+    <!-- 操作反馈提示。-->
     <TextView android:id="@+id/immersionHint"
         android:layout_width="wrap_content" android:layout_height="wrap_content"
         android:layout_gravity="center"

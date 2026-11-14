@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/scroll"
     android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="vertical" android:padding="16dp"
         android:layout_width="match_parent" android:layout_height="wrap_content">
         <TextView android:text="@string/settings_title" android:textSize="20sp"
-            android:textColor="#1b1136" android:layout_marginBottom="14dp"
+            android:textColor="@color/fg" android:layout_marginBottom="14dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <EditText android:id="@+id/editIp" android:hint="@string/hint_ip"
             android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="10dp"
@@ -20,44 +20,44 @@
             android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="18dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <TextView android:text="@string/conn_mode_label" android:textSize="14sp"
-            android:textColor="#1b1136" android:layout_marginBottom="4dp"
+            android:textColor="@color/fg" android:layout_marginBottom="4dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <RadioGroup android:id="@+id/radioMode" android:orientation="horizontal"
             android:layout_marginBottom="10dp"
             android:layout_width="match_parent" android:layout_height="wrap_content">
             <RadioButton android:id="@+id/modeAuto" android:text="@string/mode_auto"
-                android:textSize="12sp" android:textColor="#1b1136" android:checked="true"
+                android:textSize="12sp" android:textColor="@color/fg" android:checked="true"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             <RadioButton android:id="@+id/modeWifi" android:text="@string/mode_wifi"
-                android:textSize="12sp" android:textColor="#1b1136"
+                android:textSize="12sp" android:textColor="@color/fg"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             <RadioButton android:id="@+id/modeBt" android:text="@string/mode_bt"
-                android:textSize="12sp" android:textColor="#1b1136"
+                android:textSize="12sp" android:textColor="@color/fg"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </RadioGroup>
         <EditText android:id="@+id/editBtMac" android:hint="@string/hint_bt_mac"
             android:inputType="text" android:minHeight="50dp" android:layout_marginBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <TextView android:text="@string/bt_help" android:textSize="11sp"
-            android:textColor="#777777" android:layout_marginBottom="18dp"
+            android:textColor="@color/fg_dim" android:layout_marginBottom="18dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <CheckBox android:id="@+id/chkAutoConnect" android:text="@string/auto_connect"
-            android:textSize="15sp" android:textColor="#1b1136" android:checked="true"
+            android:textSize="15sp" android:textColor="@color/fg" android:checked="true"
             android:minHeight="48dp" android:layout_marginBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/btnSearch" android:text="@string/search_pc"
-            android:minHeight="50dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:minHeight="50dp" android:textColor="@color/accent_fg" android:background="@color/accent"
             android:layout_marginBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <TextView android:id="@+id/searchResult" android:text="@string/search_hint"
-            android:textSize="12sp" android:textColor="#777777" android:layout_marginBottom="18dp"
+            android:textSize="12sp" android:textColor="@color/fg_dim" android:layout_marginBottom="18dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/btnSave" android:text="@string/save"
-            android:minHeight="54dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:minHeight="54dp" android:textColor="@color/accent_fg" android:background="@color/accent"
             android:layout_marginBottom="8dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/btnScanAdd" android:text="@string/devices_add_scan"
-            android:minHeight="48dp" android:textColor="#11102A" android:background="#36E2E8"
+            android:minHeight="48dp" android:textColor="@color/accent_fg" android:background="@color/accent"
             android:layout_marginBottom="6dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <Button android:id="@+id/btnDelete" android:text="@string/devices_delete_title"
@@ -66,7 +66,7 @@
             style="@style/BtnDanger"/>
         <Button android:id="@+id/btnAbout" android:text="@string/btn_about"
             android:minHeight="48dp" android:layout_marginTop="8dp"
-            android:textColor="#11102A" android:background="#36E2E8"
+            android:textColor="@color/accent_fg" android:background="@color/accent"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
     </LinearLayout>
 </ScrollView>
