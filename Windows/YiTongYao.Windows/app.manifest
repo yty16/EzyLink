@@ -3,7 +3,7 @@
   <assemblyIdentity version="1.0.0.0" name="YiTongYao.app" />
   <application xmlns="urn:schemas-microsoft-com:asm.v3">
     <windowsSettings>
-      <!-- 4K 高缩放（希沃交互智能平板等）：按每个显示器独立 DPI 渲染，避免界面模糊与尺寸换算失真 -->
+      <!-- 高 DPI 高缩放显示器：按每个显示器独立 DPI 渲染，避免界面模糊与尺寸换算失真 -->
       <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
       <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">PerMonitorV2,PerMonitor</dpiAwareness>
     </windowsSettings>
