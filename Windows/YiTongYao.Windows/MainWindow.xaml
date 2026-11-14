@@ -190,11 +190,15 @@
                     <CheckBox x:Name="MinimizeTrayBox" Content="关闭时最小化到托盘"
                               Style="{StaticResource Check}" Checked="TrayOption_Changed" Unchecked="TrayOption_Changed"
                               ToolTip="需要托盘图标可见才能恢复窗口，与「隐藏系统托盘图标」互斥"/>
+                    <CheckBox x:Name="AutoCheckUpdateBox" Content="启动时自动检查更新"
+                              Style="{StaticResource Check}" Checked="Option_Changed" Unchecked="Option_Changed"
+                              ToolTip="仅向 GitHub Releases 查询版本号，下载需你手动确认"/>
                 </WrapPanel>
                 <TextBlock FontSize="11" Foreground="{DynamicResource AppFgDim}" TextWrapping="Wrap" Margin="0,6,0,0">
                     「开机自动启动软件」随 Windows 登录启动本程序（写入当前用户的启动项，无需管理员权限）；配合「启动后自动开启服务」即可开机即待命。
                     隐藏托盘图标后可用 Ctrl+Alt+Y 随时唤出主窗口，此时关闭窗口将直接退出程序。
                     「隐藏系统托盘图标」与「关闭时最小化到托盘」二者互斥，只能选其一，或都不选（最小化到托盘需要托盘图标可见）。
+                    「启动时自动检查更新」仅查询 GitHub Releases 的最新版本号，不会自动下载或安装；也可随时点「检查更新」手动查询。
                 </TextBlock>
             </StackPanel>
         </Border>

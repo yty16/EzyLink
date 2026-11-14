@@ -158,6 +158,7 @@ public partial class MainWindow : Window
             LaunchSilentBox.IsChecked = _settings.LaunchSilently;
             HideTrayBox.IsChecked = _settings.HideTrayIcon;
             MinimizeTrayBox.IsChecked = _settings.MinimizeToTray;
+            AutoCheckUpdateBox.IsChecked = _settings.AutoCheckUpdate;
             // 二者互斥：任一项选中时禁用另一项，避免「隐藏托盘却最小化到托盘」导致无入口
             HideTrayBox.IsEnabled = !_settings.MinimizeToTray;
             MinimizeTrayBox.IsEnabled = !_settings.HideTrayIcon;
@@ -478,6 +479,7 @@ public partial class MainWindow : Window
         _settings.AutoStartServer = AutoStartServerBox.IsChecked == true;
         _settings.LaunchSilently = LaunchSilentBox.IsChecked == true;
         _settings.MinimizeToTray = MinimizeTrayBox.IsChecked == true;
+        _settings.AutoCheckUpdate = AutoCheckUpdateBox.IsChecked == true;
         _settings.Save();
         Log("设置已保存");
     }

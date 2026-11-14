@@ -36,10 +36,10 @@ public partial class AuthMethodsWindow : Window
             {
                 Content = AuthOperation.Label(op),
                 Tag = op,
-                Foreground = System.Windows.Media.Brushes.White,
                 FontSize = 12,
                 Margin = new Thickness(0, 2, 14, 2)
             };
+            cb.SetResourceReference(Control.ForegroundProperty, "AppFg");
             cb.Checked += Op_Changed;
             cb.Unchecked += Op_Changed;
             _opsChecks.Add(cb);
@@ -180,32 +180,37 @@ public partial class AuthMethodsWindow : Window
             Height = 300,
             Owner = this,
             ResizeMode = ResizeMode.NoResize,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            Background = new System.Windows.Media.SolidColorBrush(
-                System.Windows.Media.Color.FromRgb(0x1b, 0x11, 0x36))
+            WindowStartupLocation = WindowStartupLocation.CenterOwner
         };
+        dlg.SetResourceReference(Control.BackgroundProperty, "AppBg");
+        dlg.SetResourceReference(Control.ForegroundProperty, "AppFg");
         var root = new StackPanel { Margin = new Thickness(14) };
-        root.Children.Add(new TextBlock
+        var hint = new TextBlock
         {
             Text = "检测到以下可移动磁盘：",
-            Foreground = System.Windows.Media.Brushes.White,
             Margin = new Thickness(0, 0, 0, 8)
-        });
+        };
+        hint.SetResourceReference(Control.ForegroundProperty, "AppFg");
+        root.Children.Add(hint);
         var lb = new ListBox { Height = 120 };
+        lb.SetResourceReference(Control.BackgroundProperty, "AppSurface");
+        lb.SetResourceReference(Control.ForegroundProperty, "AppFg");
         lb.ItemsSource = vols.Select(v => v.Label + "   (" + v.RootPath + ")").ToList();
         lb.SelectedIndex = 0;
         root.Children.Add(lb);
         var chk = new CheckBox
         {
             Content = "令牌文件模式（在 U 盘写入隐藏令牌文件，校验更严格）",
-            Foreground = System.Windows.Media.Brushes.White,
             Margin = new Thickness(0, 10, 0, 0)
         };
+        chk.SetResourceReference(Control.ForegroundProperty, "AppFg");
         root.Children.Add(chk);
 
         (string, bool)? result = null;
         var row = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, Margin = new Thickness(0, 12, 0, 0) };
         var ok = new Button { Content = "确定", Width = 80, Padding = new Thickness(8, 5, 8, 5), Margin = new Thickness(0, 0, 8, 0) };
+        ok.SetResourceReference(Control.BackgroundProperty, "AppControlBg");
+        ok.SetResourceReference(Control.ForegroundProperty, "AppFg");
         ok.Click += (_, _) =>
         {
             if (lb.SelectedIndex < 0) return;
@@ -214,6 +219,8 @@ public partial class AuthMethodsWindow : Window
             dlg.Close();
         };
         var cancel = new Button { Content = "取消", Width = 80, Padding = new Thickness(8, 5, 8, 5) };
+        cancel.SetResourceReference(Control.BackgroundProperty, "AppControlBg");
+        cancel.SetResourceReference(Control.ForegroundProperty, "AppFg");
         cancel.Click += (_, _) => { dlg.DialogResult = false; dlg.Close(); };
         row.Children.Add(ok);
         row.Children.Add(cancel);

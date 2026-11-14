@@ -5,6 +5,27 @@
         Background="{DynamicResource AppBg}" Foreground="{DynamicResource AppFg}"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
         Icon="Assets\vty_icon.ico">
+    <Window.Resources>
+        <!-- 禁用态显式上色，避免 WPF 默认浅底淡字在深色主题下看不清 -->
+        <Style x:Key="AuthBtn" TargetType="Button">
+            <Setter Property="Background" Value="{DynamicResource AppControlBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppFg}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="{DynamicResource AppSurfaceAlt}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource AppFgDim}"/>
+                    <Setter Property="Cursor" Value="None"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="AuthDangerBtn" TargetType="Button" BasedOn="{StaticResource AuthBtn}">
+            <Setter Property="Background" Value="{DynamicResource AppDangerBg}"/>
+        </Style>
+    </Window.Resources>
     <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,16 +45,11 @@
                 <ListBox x:Name="MethodList" Grid.Row="0" Background="Transparent" Foreground="{DynamicResource AppFg}"
                          BorderThickness="0" SelectionChanged="MethodList_SelectionChanged"/>
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
-                    <Button x:Name="AddPwdBtn" Content="添加密码" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
-                            BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddPwdBtn_Click"/>
-                    <Button x:Name="AddSystemBtn" Content="添加系统解锁" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
-                            BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddSystemBtn_Click"/>
-                    <Button x:Name="AddUsbBtn" Content="登记U盘" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
-                            BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="AddUsbBtn_Click"/>
-                    <Button x:Name="EditBtn" Content="修改" Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}"
-                            BorderThickness="0" Padding="10,5" Margin="0,0,6,0" Click="EditBtn_Click"/>
-                    <Button x:Name="RemoveBtn" Content="删除" Background="{DynamicResource AppDangerBg}" Foreground="{DynamicResource AppFg}"
-                            BorderThickness="0" Padding="10,5" Click="RemoveBtn_Click"/>
+                    <Button x:Name="AddPwdBtn" Content="添加密码" Style="{StaticResource AuthBtn}" Click="AddPwdBtn_Click"/>
+                    <Button x:Name="AddSystemBtn" Content="添加系统解锁" Style="{StaticResource AuthBtn}" Click="AddSystemBtn_Click"/>
+                    <Button x:Name="AddUsbBtn" Content="登记U盘" Style="{StaticResource AuthBtn}" Click="AddUsbBtn_Click"/>
+                    <Button x:Name="EditBtn" Content="修改" Style="{StaticResource AuthBtn}" Click="EditBtn_Click"/>
+                    <Button x:Name="RemoveBtn" Content="删除" Style="{StaticResource AuthDangerBtn}" Click="RemoveBtn_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
