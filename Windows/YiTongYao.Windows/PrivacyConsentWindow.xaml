@@ -42,7 +42,7 @@
                         · 扫码连接的相机画面只在内存中实时解码，不写文件、不传输、不留存；
                     </TextBlock>
                     <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" LineHeight="19" Margin="2,0,0,10">
-                        · 自动更新仅向 GitHub Releases 公开接口查询最新版本号，不含任何本机个人信息，下载需你确认。
+                        · 自动更新仅向 GitHub Releases 公开接口查询最新版本号，不含任何本机个人信息；默认下载需你确认，开启「自动静默更新」后会自动下载安装。
                     </TextBlock>
 
                     <TextBlock Text="三、对个人权益的影响" FontSize="13" FontWeight="Bold" Foreground="{DynamicResource AppFg}" Margin="0,0,0,3"/>

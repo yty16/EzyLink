@@ -94,14 +94,15 @@ internal static class UpdateService
     }
 
     /// <summary>下载并启动安装包。</summary>
-    public static async Task<bool> PerformUpdateAsync(UpdateInfo info, Action<string>? progress = null)
+    public static async Task<bool> PerformUpdateAsync(UpdateInfo info, Action<string>? progress = null, bool silent = false)
     {
         try
         {
             var asset = PickAsset(info.Assets);
             if (asset == null)
             {
-                OpenUrl(info.ReleaseUrl);
+                progress?.Invoke("未找到适用于本机的安装包");
+                if (!silent) OpenUrl(info.ReleaseUrl);
                 return false;
             }
 
@@ -112,13 +113,16 @@ internal static class UpdateService
             await using (var fs = File.Create(tmp))
                 await resp.Content.ReadAsStream().CopyToAsync(fs);
 
+            if (new FileInfo(tmp).Length < 1024 * 1024)
+                throw new IOException("下载文件不完整");
+
             progress?.Invoke("下载完成，正在启动安装程序…");
-            return LaunchInstaller(tmp, info.ReleaseUrl);
+            return LaunchInstaller(tmp, info.ReleaseUrl, silent);
         }
         catch (Exception ex)
         {
             progress?.Invoke("自动更新失败：" + ex.Message);
-            OpenUrl(info.ReleaseUrl);
+            if (!silent) OpenUrl(info.ReleaseUrl);
             return false;
         }
     }
@@ -132,16 +136,18 @@ internal static class UpdateService
                ?? assets.FirstOrDefault(a => a.Name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
     }
 
-    private static bool LaunchInstaller(string path, string fallbackUrl)
+    private static bool LaunchInstaller(string path, string fallbackUrl, bool silent)
     {
         try
         {
-            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true });
+            var psi = new ProcessStartInfo(path) { UseShellExecute = true };
+            if (silent) psi.ArgumentList.Add("/S");
+            Process.Start(psi);
             return true;
         }
         catch
         {
-            OpenUrl(fallbackUrl);
+            if (!silent) OpenUrl(fallbackUrl);
             return false;
         }
     }

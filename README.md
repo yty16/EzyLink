@@ -18,7 +18,7 @@
 
 | 端           | 形态                      | 版本      | 说明                                                                                   |
 | ----------- | ----------------------- | ------- | ------------------------------------------------------------------------------------ |
-| **Windows** | `exe`（.NET 8 WPF）       | 1.9.1.6 | 电脑主机端，含 Wi-Fi Direct 直连、蓝牙直连、安全认证（密码 / Windows Hello / U 盘）、扫码连接、系统托盘、开机自启、自动更新      |
+| **Windows** | `exe`（.NET 8 WPF）       | 1.9.1.7 | 电脑主机端，含 Wi-Fi Direct 直连、蓝牙直连、安全认证（密码 / Windows Hello / U 盘）、扫码连接、系统托盘、开机自启、自动更新      |
 | **Watch**   | `apk`（Android，圆屏/方屏自适应） | 1.6.0.2 | 手表端，支持多设备记录与切换、主页面/设置页表冠旋转滑动、蓝牙直连、旋转表冠翻页、沉浸模式防抬腕亮屏、扫码连接、打开即自动连接（测试环境为HW watch 4 pro） |
 | **Phone**   | `apk`（Android，竖屏大屏）     | 1.4.0.2 | 手机端，支持多设备记录与切换、蓝牙直连、扫码连接、打开即自动连接                                                     |
 
@@ -39,8 +39,8 @@
 
 ## 安装包
 
-- `installer/易通遥-1.9.1.6-win-x64-setup.exe` —— Windows 安装程序（自包含 .NET 运行时，无需预装 .NET）
-- `dist/易通遥-1.9.1.6-x64-portable.zip` —— Windows 便携版（解压即用）
+- `installer/易通遥-1.9.1.7-win-x64-setup.exe` —— Windows 安装程序（自包含 .NET 运行时，无需预装 .NET）
+- `dist/易通遥-1.9.1.7-x64-portable.zip` —— Windows 便携版（解压即用）
 - `dist/yitongyao-watch-1.6.0.2.apk` —— 手表端 APK
 - `dist/yitongyao-phone-1.4.0.2.apk` —— 手机端 APK
 
@@ -279,6 +279,7 @@ makensis /DPROJECTROOT="E:/workbuddy/易通遥" installer_source/yitongyao.nsi
 - 逻辑：查询 GitHub Releases 最新版本 → 按 `a.b.c.d` 比较 → 弹窗展示更新日志 → 确认后下载 `win-x64` 安装包 → 启动安装器并退出本程序。
 - 仓库地址在 `Core/AppConstants.cs`（`GitHubOwner` / `GitHubRepo`）。当前若发布页暂无 Release，会提示「发布页暂无 Release」，不影响使用。
 - 全程可降级：网络异常时提示并给出发布页链接，可手动下载。
+- 「启动与托盘」新增「自动静默更新」开关（默认关闭）：开启后启动检查到新版本会自动下载 `win-x64` 安装包、以 `/S` 静默安装并重启本程序；仅对安装版生效，便携版仍需手动更新。
 
 ## 日志与问题排查
 

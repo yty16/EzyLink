@@ -33,6 +33,15 @@ internal sealed class SettingsStore
 
     public bool AutoCheckUpdate { get; set; } = true;
 
+    /// <summary>启动时发现新版本自动下载并静默安装。</summary>
+    public bool AutoSilentUpdate { get; set; } = false;
+
+    /// <summary>自动更新已尝试的版本号。</summary>
+    public string AutoUpdateTriedVersion { get; set; } = "";
+
+    /// <summary>自动更新上次尝试时间。</summary>
+    public DateTime AutoUpdateTriedAt { get; set; } = DateTime.MinValue;
+
     // ---------- 外观主题 ----------
     /// <summary>主题模式：system / light / dark（对应 ThemeManager.ThemeMode）。</summary>
     public string ThemeMode { get; set; } = "system";

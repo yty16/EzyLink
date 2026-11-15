@@ -10,7 +10,7 @@ SetCompressor lzma
 
 !define APPNAME "易通遥"
 !define APPNAMEEN "YiTongYao"
-!define APPVERSION "1.9.1.6"
+!define APPVERSION "1.9.1.7"
 !define PUBLISHER "yty16"
 !define EXENAME "YiTongYao.exe"
 !define APPDIR "$LOCALAPPDATA\Programs\${APPNAME}"
@@ -80,10 +80,23 @@ Var isFreshInstall
 
 ; ---------- OS check ----------
 Function .onInit
+  StrCpy $isFreshInstall 0
   ${Unless} ${AtLeastWin10}
     MessageBox MB_OK|MB_ICONSTOP "本软件需要 Windows 10 或更高版本。当前操作系统不受支持，安装已终止。"
     Abort
   ${EndIf}
+  ReadRegStr $0 "HKCU" "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAME}" "InstallLocation"
+  ${If} $0 != ""
+    StrCpy $INSTDIR $0
+  ${EndIf}
+FunctionEnd
+
+; ---------- 静默安装完成后重启程序 ----------
+Function .onInstSuccess
+  IfSilent run done
+run:
+  Exec "$INSTDIR\${EXENAME}"
+done:
 FunctionEnd
 
 ; ---------- Directory validation: space + writable ----------

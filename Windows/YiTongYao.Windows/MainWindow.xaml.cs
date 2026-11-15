@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -31,6 +32,9 @@ public partial class MainWindow : Window
 
     // 选项加载期间抑制 Checked/Unchecked 回调，避免初始化时反复写注册表
     private bool _loadingOptions;
+
+    // 选项联动期间抑制递归回调
+    private bool _syncingOptions;
 
     // 是否由「开机自动启动」拉起（命令行带 --startup）
     private readonly bool _startupLaunch;
@@ -159,6 +163,7 @@ public partial class MainWindow : Window
             HideTrayBox.IsChecked = _settings.HideTrayIcon;
             MinimizeTrayBox.IsChecked = _settings.MinimizeToTray;
             AutoCheckUpdateBox.IsChecked = _settings.AutoCheckUpdate;
+            AutoSilentUpdateBox.IsChecked = _settings.AutoSilentUpdate;
             // 二者互斥：任一项选中时禁用另一项，避免「隐藏托盘却最小化到托盘」导致无入口
             HideTrayBox.IsEnabled = !_settings.MinimizeToTray;
             MinimizeTrayBox.IsEnabled = !_settings.HideTrayIcon;
@@ -475,11 +480,25 @@ public partial class MainWindow : Window
 
     private void Option_Changed(object sender, RoutedEventArgs e)
     {
-        if (_loadingOptions) return;
+        if (_loadingOptions || _syncingOptions) return;
+        _syncingOptions = true;
+        try
+        {
+            if (sender == AutoSilentUpdateBox && AutoSilentUpdateBox.IsChecked == true)
+                AutoCheckUpdateBox.IsChecked = true;
+            if (sender == AutoCheckUpdateBox && AutoCheckUpdateBox.IsChecked != true)
+                AutoSilentUpdateBox.IsChecked = false;
+        }
+        finally
+        {
+            _syncingOptions = false;
+        }
+
         _settings.AutoStartServer = AutoStartServerBox.IsChecked == true;
         _settings.LaunchSilently = LaunchSilentBox.IsChecked == true;
         _settings.MinimizeToTray = MinimizeTrayBox.IsChecked == true;
         _settings.AutoCheckUpdate = AutoCheckUpdateBox.IsChecked == true;
+        _settings.AutoSilentUpdate = AutoSilentUpdateBox.IsChecked == true;
         _settings.Save();
         Log("设置已保存");
     }
@@ -900,6 +919,12 @@ public partial class MainWindow : Window
                 return;
             }
 
+            if (!showNoUpdateDialog && _settings.AutoSilentUpdate && IsInstalledInstance())
+            {
+                await PerformSilentUpdateAsync(info);
+                return;
+            }
+
             Log($"发现新版本 v{info.Version}，请在弹出窗口中确认是否更新");
             var win = new UpdateWindow(info) { Owner = this };
             win.ShowDialog();
@@ -907,6 +932,59 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             Log("检查更新异常：" + ex.Message);
+        }
+    }
+
+    /// <summary>自动下载并静默安装新版本。</summary>
+    private async Task PerformSilentUpdateAsync(UpdateInfo info)
+    {
+        if (IsRecentlyTried(info.Version)) return;
+
+        _settings.AutoUpdateTriedVersion = info.Version ?? "";
+        _settings.AutoUpdateTriedAt = DateTime.Now;
+        _settings.Save();
+
+        Log($"发现新版本 v{info.Version}，开始自动静默更新");
+        void Progress(string msg) => Log(msg);
+
+        var started = await UpdateService.PerformUpdateAsync(info, Progress, silent: true);
+        if (!started)
+        {
+            Log("自动静默更新未成功，24 小时内不再重试；可点「检查更新」手动处理");
+            return;
+        }
+
+        Log("安装程序已启动，本程序即将退出以完成更新");
+        try { System.Windows.Application.Current.Shutdown(); }
+        catch { Environment.Exit(0); }
+    }
+
+    /// <summary>同一版本 24 小时内不重复自动更新。</summary>
+    private bool IsRecentlyTried(string? version)
+    {
+        if (string.IsNullOrWhiteSpace(version)) return true;
+        return _settings.AutoUpdateTriedVersion == version &&
+               (DateTime.Now - _settings.AutoUpdateTriedAt).TotalHours < 24;
+    }
+
+    /// <summary>判断当前是否运行在已安装目录中。</summary>
+    private static bool IsInstalledInstance()
+    {
+        try
+        {
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+                @"Software\Microsoft\Windows\CurrentVersion\Uninstall\" + AppConstants.AppName, false);
+            var dir = key?.GetValue("InstallLocation") as string;
+            if (string.IsNullOrWhiteSpace(dir)) return false;
+            var current = Path.GetDirectoryName(AutoStart.ExePath) ?? "";
+            return string.Equals(
+                Path.GetFullPath(dir).TrimEnd(Path.DirectorySeparatorChar),
+                Path.GetFullPath(current).TrimEnd(Path.DirectorySeparatorChar),
+                StringComparison.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
         }
     }
 
