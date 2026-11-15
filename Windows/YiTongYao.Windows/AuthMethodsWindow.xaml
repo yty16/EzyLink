@@ -7,10 +7,9 @@
         Icon="Assets\vty_icon.ico">
     <Window.Resources>
         <!-- 禁用态显式上色，避免 WPF 默认浅底淡字在深色主题下看不清 -->
-        <Style x:Key="AuthBtn" TargetType="Button">
+        <Style x:Key="AuthBtn" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Background" Value="{DynamicResource AppControlBg}"/>
             <Setter Property="Foreground" Value="{DynamicResource AppFg}"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="10,5"/>
             <Setter Property="Margin" Value="0,0,6,0"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -75,7 +74,7 @@
                     Style="{StaticResource AuthBtn}" Click="RegenCodeBtn_Click"
                     ToolTip="作废旧恢复码并生成一个新的，仅显示一次"/>
             <Button x:Name="CloseBtn" Grid.Column="1" Content="关闭" Width="90" Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}"
-                    FontWeight="Bold" BorderThickness="0" Padding="10,6" Click="CloseBtn_Click"/>
+                    FontWeight="Bold" BorderThickness="1" Padding="10,6" Click="CloseBtn_Click"/>
         </Grid>
     </Grid>
 </Window>

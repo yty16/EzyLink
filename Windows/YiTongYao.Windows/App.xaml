@@ -8,6 +8,7 @@
         <SolidColorBrush x:Key="AppSurfaceAlt" Color="#2a2350"/>
         <SolidColorBrush x:Key="AppControlBg" Color="#3a2a6e"/>
         <SolidColorBrush x:Key="AppBorder" Color="#3a2a6e"/>
+        <SolidColorBrush x:Key="AppBtnBorder" Color="#6a58a8"/>
         <SolidColorBrush x:Key="AppFg" Color="#ECEAFF"/>
         <SolidColorBrush x:Key="AppFgMuted" Color="#9C93C9"/>
         <SolidColorBrush x:Key="AppFgDim" Color="#7d73a8"/>
@@ -23,5 +24,18 @@
             <GradientStop Color="#36E2E8" Offset="0"/>
             <GradientStop Color="#965CE9" Offset="1"/>
         </LinearGradientBrush>
+        <!-- 所有按钮默认带边框 -->
+        <Style TargetType="Button">
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource AppBtnBorder}"/>
+        </Style>
+        <!-- 主按钮，全局可用 -->
+        <Style x:Key="AccentBtn" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="{DynamicResource BrandBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppAccentFg}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
     </Application.Resources>
 </Application>

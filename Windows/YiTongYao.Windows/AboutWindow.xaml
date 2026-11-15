@@ -10,11 +10,10 @@
             <Setter Property="Foreground" Value="{DynamicResource AppFgMuted}"/>
             <Setter Property="FontSize" Value="12"/>
         </Style>
-        <Style x:Key="CardBtn" TargetType="Button">
+        <Style x:Key="CardBtn" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
             <Setter Property="Background" Value="{DynamicResource AppControlBg}"/>
             <Setter Property="Foreground" Value="{DynamicResource AppFg}"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
     </Window.Resources>

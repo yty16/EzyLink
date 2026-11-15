@@ -30,14 +30,6 @@
             <Setter Property="Margin" Value="0,4,18,4"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
-        <Style x:Key="AccentBtn" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource BrandBrush}"/>
-            <Setter Property="Foreground" Value="{DynamicResource AppAccentFg}"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="16,8"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-        </Style>
         <!-- 卡片内次级按钮；禁用态显式指定深色，避免 WPF 默认浅底白字 -->
         <Style x:Key="CardBtn" TargetType="Button" BasedOn="{StaticResource AccentBtn}">
             <Setter Property="Background" Value="{DynamicResource AppControlBg}"/>

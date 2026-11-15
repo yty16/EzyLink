@@ -126,9 +126,9 @@
 
         <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,8">
             <Button x:Name="DeclineBtn" Content="关闭" Padding="16,7" Margin="0,0,10,0"
-                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="0" Click="DeclineBtn_Click"/>
+                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="1" Click="DeclineBtn_Click"/>
             <Button x:Name="AcceptBtn" Content="同意并继续" Padding="16,7" IsEnabled="False"
-                    Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}" BorderThickness="0" Click="AcceptBtn_Click"/>
+                    Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}" BorderThickness="1" Click="AcceptBtn_Click"/>
         </StackPanel>
 
         <StackPanel Grid.Row="6" Margin="0,2,0,0">

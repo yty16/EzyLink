@@ -33,13 +33,13 @@
 
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="LaterBtn" Content="稍后再说" Padding="16,8" Margin="0,0,10,0"
-                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="0" Cursor="Hand"
+                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="1" Cursor="Hand"
                     Click="LaterBtn_Click"/>
             <Button x:Name="PageBtn" Content="打开发布页" Padding="16,8" Margin="0,0,10,0"
-                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="0" Cursor="Hand"
+                    Background="{DynamicResource AppControlBg}" Foreground="{DynamicResource AppFg}" BorderThickness="1" Cursor="Hand"
                     Click="PageBtn_Click"/>
             <Button x:Name="UpdateBtn" Content="立即更新" Padding="20,8" FontWeight="Bold"
-                    Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}" BorderThickness="0" Cursor="Hand"
+                    Background="{StaticResource BrandBrush}" Foreground="{DynamicResource AppAccentFg}" BorderThickness="1" Cursor="Hand"
                     Click="UpdateBtn_Click"/>
         </StackPanel>
     </Grid>

@@ -19,6 +19,7 @@ internal static class ThemeManager
         ["AppSurfaceAlt"] = ("#2a2350", "#eceaf6"),
         ["AppControlBg"]  = ("#3a2a6e", "#ffffff"),
         ["AppBorder"]     = ("#3a2a6e", "#d6d2ec"),
+        ["AppBtnBorder"]  = ("#6a58a8", "#b9b2da"),
         ["AppFg"]         = ("#ECEAFF", "#1b1136"),
         ["AppFgMuted"]    = ("#9C93C9", "#5f6b7a"),
         ["AppFgDim"]      = ("#7d73a8", "#8a86a8"),
