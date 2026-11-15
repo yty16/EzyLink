@@ -32,11 +32,24 @@ public class UpdateAsset
 internal static class UpdateService
 {
     private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(25) };
+    private static readonly HttpClient _dl = new() { Timeout = Timeout.InfiniteTimeSpan };
 
     static UpdateService()
     {
-        try { _http.DefaultRequestHeaders.UserAgent.ParseAdd("YiTongYao-Updater"); } catch { }
+        try
+        {
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("YiTongYao-Updater");
+            _dl.DefaultRequestHeaders.UserAgent.ParseAdd("YiTongYao-Updater");
+        }
+        catch { }
     }
+
+    // GitHub 代理镜像（备用下载源），随时可能变更或失效。
+    private static readonly string[] ProxyHosts =
+    {
+        "https://gh-proxy.com/",
+        "https://ghfast.top/",
+    };
 
     public static string CurrentVersion
     {
@@ -96,33 +109,85 @@ internal static class UpdateService
     /// <summary>下载并启动安装包。</summary>
     public static async Task<bool> PerformUpdateAsync(UpdateInfo info, Action<string>? progress = null, bool silent = false)
     {
+        var asset = PickAsset(info.Assets);
+        if (asset == null)
+        {
+            progress?.Invoke("未找到适用于本机的安装包");
+            if (!silent) OpenUrl(info.ReleaseUrl);
+            return false;
+        }
+
+        var tmp = Path.Combine(Path.GetTempPath(), asset.Name);
+        foreach (var url in BuildCandidateUrls(asset))
+        {
+            var src = SourceLabel(url);
+            progress?.Invoke("正在从" + src + "下载 " + asset.Name + "（" + asset.SizeText + "）…");
+            try { if (File.Exists(tmp)) File.Delete(tmp); } catch { }
+
+            if (await TryDownloadAsync(url, tmp, asset.Size, progress, src))
+            {
+                progress?.Invoke("下载完成，正在启动安装程序…");
+                return LaunchInstaller(tmp, info.ReleaseUrl, silent);
+            }
+            progress?.Invoke(src + "下载失败，尝试下一源…");
+        }
+
+        progress?.Invoke("所有下载源均失败，已打开发布页");
+        if (!silent) OpenUrl(info.ReleaseUrl);
+        return false;
+    }
+
+    // 构建下载候选源：官方源优先，代理镜像兜底。
+    private static List<string> BuildCandidateUrls(UpdateAsset asset)
+    {
+        var urls = new List<string> { asset.Url };
+        foreach (var p in ProxyHosts)
+            urls.Add(p + asset.Url);
+        return urls;
+    }
+
+    private static string SourceLabel(string url)
+    {
+        foreach (var p in ProxyHosts)
+        {
+            var host = p.Replace("https://", "").TrimEnd('/');
+            if (url.Contains(host)) return host + " 镜像";
+        }
+        return "GitHub 官方源";
+    }
+
+    // 单源下载：6 分钟上限，流式写入并校验大小。
+    private static async Task<bool> TryDownloadAsync(string url, string tmp, long expectSize, Action<string>? progress, string src)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(6));
         try
         {
-            var asset = PickAsset(info.Assets);
-            if (asset == null)
+            using var resp = await _dl.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cts.Token);
+            if (!resp.IsSuccessStatusCode) return false;
+            var total = resp.Content.Headers.ContentLength ?? 0;
+            await using var fs = File.Create(tmp);
+            await using var stream = await resp.Content.ReadAsStreamAsync(cts.Token);
+            var buf = new byte[81920];
+            long read = 0;
+            int n;
+            while ((n = await stream.ReadAsync(buf, cts.Token)) > 0)
             {
-                progress?.Invoke("未找到适用于本机的安装包");
-                if (!silent) OpenUrl(info.ReleaseUrl);
-                return false;
+                await fs.WriteAsync(buf.AsMemory(0, n), cts.Token);
+                read += n;
+                if (total > 0 && (read & 0x3FFFF) == 0)
+                    progress?.Invoke("从" + src + "下载中 " + (read / 1048576.0).ToString("0.0") + " / " + (total / 1048576.0).ToString("0.0") + " MB");
             }
+            await fs.FlushAsync(cts.Token);
 
-            progress?.Invoke("正在下载 " + asset.Name + "…");
-            var tmp = Path.Combine(Path.GetTempPath(), asset.Name);
-            using var resp = await _http.GetAsync(asset.Url);
-            resp.EnsureSuccessStatusCode();
-            await using (var fs = File.Create(tmp))
-                await resp.Content.ReadAsStream().CopyToAsync(fs);
-
-            if (new FileInfo(tmp).Length < 1024 * 1024)
-                throw new IOException("下载文件不完整");
-
-            progress?.Invoke("下载完成，正在启动安装程序…");
-            return LaunchInstaller(tmp, info.ReleaseUrl, silent);
+            var len = new FileInfo(tmp).Length;
+            return expectSize > 0 ? len == expectSize : len >= 1024 * 1024;
         }
-        catch (Exception ex)
+        catch (OperationCanceledException)
         {
-            progress?.Invoke("自动更新失败：" + ex.Message);
-            if (!silent) OpenUrl(info.ReleaseUrl);
+            return false;
+        }
+        catch
+        {
             return false;
         }
     }

@@ -16,9 +16,9 @@
     <NoWarn>$(NoWarn);WFAC010</NoWarn>
     <AssemblyTitle>易通遥 远程控制</AssemblyTitle>
     <Product>易通遥</Product>
-    <Version>1.9.1.7</Version>
-    <AssemblyVersion>1.9.1.7</AssemblyVersion>
-    <FileVersion>1.9.1.7</FileVersion>
+    <Version>1.9.1.8</Version>
+    <AssemblyVersion>1.9.1.8</AssemblyVersion>
+    <FileVersion>1.9.1.8</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
