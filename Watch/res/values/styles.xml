@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.NoActionBar">
+    <!-- 使用框架标准浅色主题，默认文字为深色。 -->
+    <style name="AppTheme" parent="@android:style/Theme.DeviceDefault.Light.NoActionBar">
         <item name="android:windowBackground">@color/bg</item>
+        <item name="android:textColor">@color/fg</item>
+        <item name="android:textColorHint">@color/fg_dim</item>
+        <item name="android:editTextColor">@color/fg</item>
+        <item name="android:colorForeground">@color/fg</item>
     </style>
     <style name="Btn" parent="@android:style/Widget.Button">
         <item name="android:layout_width">0dp</item>

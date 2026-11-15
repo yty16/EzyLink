@@ -51,8 +51,8 @@ def read_keypass():
 
 # 三端版本号（a.b.c.d）
 VERSIONS = {
-    "watch": ("1.6.0.2", 1060002),
-    "phone": ("1.4.0.2", 1040002),
+    "watch": ("1.6.0.3", 1060003),
+    "phone": ("1.4.0.3", 1040003),
 }
 
 ENV = dict(os.environ)
