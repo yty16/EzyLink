@@ -56,6 +56,12 @@ public class MainActivity extends Activity {
                 finish();
                 return;
             }
+            // 首次打开提醒下载电脑版
+            if (!prefs.getBoolean("dl_pc_shown", false)) {
+                startActivity(new Intent(MainActivity.this, DownloadPcActivity.class));
+                finish();
+                return;
+            }
             initUi();
         } catch (Throwable e) {
             showError(e);

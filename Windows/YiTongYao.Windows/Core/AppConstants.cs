@@ -19,8 +19,12 @@ internal static class AppConstants
     public const string GitHubReleasesUrl = "https://github.com/yty16/EzyLink/releases";
     public const string GitHubLatestApi = "https://api.github.com/repos/yty16/EzyLink/releases/latest";
 
+    // ---- 网盘下载（123 盘镜像，国内加速）----
+    public const string PanDownloadUrl = "https://1847400086.share.123pan.cn/123pan/OE2vvd-r9aMh?pwd=umtD#";
+    public const string PanExtractCode = "umtD";
+
     // 内部产品标识（Base64），仅用于构建/分发溯源，不做任何鉴权用途。
     internal const string ProductCode = "eXR5MTY=";
 
-    public const string Version = "1.9.1.8";
+    public const string Version = "1.9.1.9";
 }

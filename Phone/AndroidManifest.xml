@@ -33,6 +33,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".AboutActivity" android:exported="false"
             android:screenOrientation="portrait" />
+        <activity android:name=".DownloadPcActivity" android:exported="false"
+            android:screenOrientation="portrait" />
         <activity android:name=".DeviceListActivity" android:exported="false"
             android:label="@string/devices_title"
             android:screenOrientation="portrait" />

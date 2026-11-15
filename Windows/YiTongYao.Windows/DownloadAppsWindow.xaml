@@ -1,0 +1,62 @@
+﻿<Window x:Class="YiTongYao.Windows.DownloadAppsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="下载手机端 / 手表端" Height="540" Width="580"
+        Background="{DynamicResource AppBg}" Foreground="{DynamicResource AppFg}"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
+        Icon="Assets\vty_icon.ico">
+    <Window.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource AppSurface}"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14"/>
+        </Style>
+        <Style x:Key="CardBtn" TargetType="Button" BasedOn="{StaticResource AccentBtn}">
+            <Setter Property="Background" Value="{DynamicResource AppControlBg}"/>
+            <Setter Property="Foreground" Value="{DynamicResource AppFg}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="14,11"/>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <Image Source="Assets\vty_icon.png" Width="48" Height="48" Margin="0,0,12,0"/>
+            <TextBlock Text="下载手机端 / 手表端" FontSize="22" FontWeight="Bold" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <TextBlock Grid.Row="1" FontSize="13" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap"
+                   LineHeight="20" Margin="0,0,0,14">
+            易通遥 需要配合手机端或手表端才能远程控制电脑。请选择你的设备，下载对应客户端并安装，之后即可自动发现并连接本机。
+        </TextBlock>
+
+        <StackPanel Grid.Row="2" Orientation="Vertical">
+            <Button x:Name="PhoneBtn" Content="手机端（Android APK）" Style="{StaticResource CardBtn}"
+                    Margin="0,0,0,10" Click="PhoneBtn_Click"/>
+            <Button x:Name="WatchBtn" Content="手表端（WearOS APK）" Style="{StaticResource CardBtn}"
+                    Margin="0,0,0,18" Click="WatchBtn_Click"/>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="网盘下载（123 盘 · 国内加速）" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <TextBlock FontSize="12" Foreground="{DynamicResource AppFgMuted}" TextWrapping="Wrap" Margin="0,0,0,4">
+                        含 Windows 安装包 / 便携版、手表端 APK、手机端 APK。
+                    </TextBlock>
+                    <TextBlock FontSize="12" Foreground="{DynamicResource AppFg}" TextWrapping="Wrap" Margin="0,0,0,10">
+                        提取码：<Run FontWeight="Bold" Foreground="{DynamicResource AppAccent}" Text="umtD"/>
+                    </TextBlock>
+                    <Button x:Name="PanBtn" Content="打开 123 盘网盘" Style="{StaticResource CardBtn}" Click="PanBtn_Click"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <Button Grid.Row="3" x:Name="StartBtn" Content="开始使用" HorizontalAlignment="Right"
+                Style="{StaticResource CardBtn}" Padding="20,9" Margin="0,14,0,0" Click="StartBtn_Click"/>
+    </Grid>
+</Window>

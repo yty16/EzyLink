@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:padding="@dimen/scr_pad"
+        android:layout_width="match_parent" android:layout_height="wrap_content">
+        <TextView android:text="@string/dl_pc_title" android:textSize="12sp"
+            android:textStyle="bold" android:textColor="@color/fg" android:layout_marginBottom="4dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="@string/dl_pc_desc" android:textSize="9sp"
+            android:textColor="@color/fg_muted" android:layout_marginBottom="6dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <TextView android:text="@string/dl_pc_pan_code_label" android:textSize="10sp"
+            android:textStyle="bold" android:textColor="@color/accent"
+            android:layout_marginBottom="8dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <Button android:id="@+id/dlPcGithub" android:text="@string/dl_pc_github_btn"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/btn_minh" android:textSize="11sp"
+            android:textColor="@color/accent_fg" android:background="@color/accent"
+            android:layout_marginBottom="6dp"/>
+        <Button android:id="@+id/dlPcPan" android:text="@string/dl_pc_pan_btn"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/btn_minh" android:textSize="11sp"
+            android:textColor="@color/accent_fg" android:background="@color/accent2"
+            android:layout_marginBottom="6dp"/>
+        <Button android:id="@+id/dlPcDismiss" android:text="@string/dl_pc_dismiss"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minHeight="@dimen/btn_minh" android:textSize="11sp"
+            android:textColor="@color/fg" android:background="@color/surface"/>
+    </LinearLayout>
+</ScrollView>

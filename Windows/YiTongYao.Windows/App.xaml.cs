@@ -112,6 +112,22 @@ public partial class App : System.Windows.Application
             }
         }
 
+        // 首次启动提示下载手机端 / 手表端
+        if (!s.FirstRunDownloadShown)
+        {
+            try
+            {
+                var dl = new DownloadAppsWindow();
+                dl.ShowDialog();
+                s.FirstRunDownloadShown = true;
+                s.Save();
+            }
+            catch (Exception ex)
+            {
+                CrashLogger.LogRun("首次下载提示失败：" + ex.Message);
+            }
+        }
+
         _mainWindow = new MainWindow();
         _mainWindow.Show();
     }

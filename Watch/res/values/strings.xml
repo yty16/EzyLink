@@ -59,4 +59,13 @@
     <string name="about_privacy">法律文件（隐私 / 协议 / 免责）：LEGAL.md</string>
     <string name="about_license">许可证：GPL-3.0-or-later（详见 LICENSE）</string>
     <string name="about_third_party">第三方组件：ZXing core（Apache-2.0）｜详见 THIRD_PARTY_NOTICES.md</string>
+    <!-- 首次下载电脑版提醒 -->
+    <string name="dl_pc_title">下载电脑版（Windows）</string>
+    <string name="dl_pc_desc">易通遥需电脑端（Windows）程序运行在电脑上，手表才能远程控制。请先在电脑安装电脑版再使用。</string>
+    <string name="dl_pc_pan_code_label">网盘提取码：umtD</string>
+    <string name="dl_pc_github_btn">电脑版（GitHub）</string>
+    <string name="dl_pc_pan_btn">网盘下载（123 盘）</string>
+    <string name="dl_pc_dismiss">我知道了</string>
+    <string name="dl_pc_github">https://github.com/yty16/EzyLink/releases</string>
+    <string name="dl_pc_pan">https://1847400086.share.123pan.cn/123pan/OE2vvd-r9aMh?pwd=umtD#</string>
 </resources>

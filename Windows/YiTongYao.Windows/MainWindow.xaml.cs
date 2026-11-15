@@ -23,6 +23,8 @@ public partial class MainWindow : Window
     private WinRtWiFiDirectServer? _wifiDirect;
     private string _wfdLastError = string.Empty;
     private NotifyIcon? _tray;
+    // 隐藏功能托盘时显示的纯展示提醒图标：无任何菜单与点击操作，仅提示程序仍在运行
+    private NotifyIcon? _reminderTray;
 
     // 推荐给设备连接的地址（移动热点地址优先）
     private string? _connectIp;
@@ -533,7 +535,7 @@ public partial class MainWindow : Window
 
         _settings.Save();
         ApplyTrayVisibility();
-        Log(hide ? "已隐藏系统托盘图标（Ctrl+Alt+Y 唤出主窗口，关闭即退出）"
+        Log(hide ? "已隐藏系统托盘图标（Ctrl+Alt+Y 唤出主窗口，关闭最小化到后台）"
                  : minimize ? "已开启关闭时最小化到托盘"
                  : "已恢复：关闭窗口直接退出，托盘图标显示");
     }
@@ -542,6 +544,9 @@ public partial class MainWindow : Window
     {
         if (_tray == null) return;
         _tray.Visible = !_settings.HideTrayIcon;
+        // 隐藏功能托盘时显示纯展示提醒图标（仅作「程序运行中」提示，无菜单无点击；唤出窗口靠 Ctrl+Alt+Y 热键）
+        if (_reminderTray != null)
+            _reminderTray.Visible = _settings.HideTrayIcon;
         // 隐藏托盘时必须保证窗口可见，否则程序将无任何可操作入口
         if (_settings.HideTrayIcon && !IsVisible) ShowWindow();
     }
@@ -571,7 +576,7 @@ public partial class MainWindow : Window
         if (IsVisible && WindowState != WindowState.Minimized)
         {
             WindowState = WindowState.Minimized;
-            if (_settings.MinimizeToTray && !_settings.HideTrayIcon) Hide();
+            if (_settings.MinimizeToTray || _settings.HideTrayIcon) Hide();
             // 收起即作废当前解锁会话，下次打开主窗口需重新输入密码
             AuthService.ResetSession();
             Log("热键 Ctrl+Alt+Y：主窗口已收起");
@@ -659,13 +664,7 @@ public partial class MainWindow : Window
     private void SetupTray()
     {
         _tray = new NotifyIcon();
-        try
-        {
-            var info = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/Assets/vty_icon.ico"));
-            if (info != null)
-                _tray.Icon = new System.Drawing.Icon(info.Stream);
-        }
-        catch { }
+        _tray.Icon = LoadTrayIcon();
         _tray.Text = "易通遥 远程控制";
         _tray.Visible = !_settings.HideTrayIcon;
         _tray.DoubleClick += (_, _) => ShowWindow();
@@ -684,6 +683,59 @@ public partial class MainWindow : Window
         menu.Items.Add(updateItem);
         menu.Items.Add(exitItem);
         _tray.ContextMenuStrip = menu;
+
+        // 隐藏功能托盘时，保留一个纯展示提醒图标（无菜单、无点击操作），提示程序仍在后台运行
+        _reminderTray = new NotifyIcon();
+        _reminderTray.Icon = LoadBlankIcon();
+        _reminderTray.Text = "易通遥 后台运行（托盘图标已隐藏）";
+        _reminderTray.Visible = _settings.HideTrayIcon;
+    }
+
+    /// <summary>加载托盘图标：优先取当前 exe 自带图标，再回退内嵌资源与磁盘文件，确保一定显示。</summary>
+    private System.Drawing.Icon? LoadTrayIcon()
+    {
+        try
+        {
+            var exe = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
+            if (!string.IsNullOrEmpty(exe))
+                return System.Drawing.Icon.ExtractAssociatedIcon(exe);
+        }
+        catch { }
+        try
+        {
+            var info = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/assets/vty_icon.ico"));
+            if (info?.Stream != null)
+                return new System.Drawing.Icon(info.Stream);
+        }
+        catch { }
+        try
+        {
+            var path = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "vty_icon.ico");
+            if (System.IO.File.Exists(path))
+                return new System.Drawing.Icon(path);
+        }
+        catch { }
+        return null;
+    }
+
+    /// <summary>加载空白提醒图标（全透明，仅占位提醒程序在后台运行，不显示任何图案）。</summary>
+    private System.Drawing.Icon? LoadBlankIcon()
+    {
+        try
+        {
+            var info = System.Windows.Application.GetResourceStream(new Uri("pack://application:,,,/assets/blank_icon.ico"));
+            if (info?.Stream != null)
+                return new System.Drawing.Icon(info.Stream);
+        }
+        catch { }
+        try
+        {
+            var path = System.IO.Path.Combine(AppContext.BaseDirectory, "Assets", "blank_icon.ico");
+            if (System.IO.File.Exists(path))
+                return new System.Drawing.Icon(path);
+        }
+        catch { }
+        return null;
     }
 
     private void ShowWindow()
@@ -1015,6 +1067,12 @@ public partial class MainWindow : Window
         }
     }
 
+    private void ExitAppBtn_Click(object? sender, RoutedEventArgs e)
+    {
+        _reallyExit = true;
+        Close();
+    }
+
     /// <summary>写日志（异步投递、行数限流）。</summary>
     private void Log(string msg)
     {
@@ -1040,8 +1098,8 @@ public partial class MainWindow : Window
 
     private void Window_StateChanged(object? sender, EventArgs e)
     {
-        // 托盘图标被隐藏时不隐藏窗口，否则程序将失去任务栏之外的唯一入口
-        if (WindowState == WindowState.Minimized && _settings.MinimizeToTray && !_settings.HideTrayIcon)
+        // 最小化到托盘或隐藏托盘时，最小化即收起窗口（仅留任务栏/空白提醒图标 + 热键入口）
+        if (WindowState == WindowState.Minimized && (_settings.MinimizeToTray || _settings.HideTrayIcon))
         {
             Hide();
             // 收起即作废当前解锁会话，下次打开主窗口需重新输入密码
@@ -1051,11 +1109,12 @@ public partial class MainWindow : Window
 
     private void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
-        // 托盘图标隐藏时关闭窗口即退出：此时没有托盘入口，继续驻留会导致程序无法唤出
-        if (!_reallyExit && !_forcedExit && _settings.MinimizeToTray && !_settings.HideTrayIcon)
+        // 隐藏托盘（或最小化到托盘）时关闭窗口改为最小化到后台：保留空白提醒图标与 Ctrl+Alt+Y 热键入口，不直接退出
+        if (!_reallyExit && !_forcedExit && (_settings.MinimizeToTray || _settings.HideTrayIcon))
         {
             e.Cancel = true;
             Hide();
+            AuthService.ResetSession();
             return;
         }
         // 退出前按认证方式验证。
@@ -1068,6 +1127,7 @@ public partial class MainWindow : Window
         CrashLogger.LogRun("==== 程序退出（用户关闭）====");
         try { if (_hwnd != IntPtr.Zero) UnregisterHotKey(_hwnd, HotkeyId); } catch { }
         _tray?.Dispose();
+        _reminderTray?.Dispose();
         StopBluetooth();
         StopWiFiDirect();
         SafeDisposeServer();

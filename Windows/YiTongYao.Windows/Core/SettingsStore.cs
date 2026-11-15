@@ -57,6 +57,9 @@ internal sealed class SettingsStore
 
     // ---------- 隐私与授权 ----------
 
+    /// <summary>首次启动是否已弹出「下载手机端 / 手表端」提示。</summary>
+    public bool FirstRunDownloadShown { get; set; } = false;
+
     /// <summary>是否已阅读并同意《隐私政策》。未同意时启动会先征求同意。</summary>
     public bool PrivacyAccepted { get; set; } = false;
 
